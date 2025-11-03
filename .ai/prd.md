@@ -32,12 +32,14 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 
 ### 3.4. Generowanie fiszek przez AI
 - Dedykowany interfejs do wklejania tekstu (od 500 do 10 000 znaków) w celu wygenerowania fiszek.
+- Przed rozpoczęciem generowania użytkownik musi wybrać istniejącą talię lub utworzyć nową.
 - Synchroniczny proces po stronie backendu, który na podstawie tekstu zwraca listę fiszek-kandydatów.
+- Sesja przeglądu wygenerowanych kandydatów jest utrwalana na backendzie, co pozwala na powrót do niej np. po odświeżeniu strony.
 - Asynchroniczna obsługa na frontendzie, aby nie blokować interfejsu użytkownika podczas generowania.
 - Prezentacja wygenerowanych kandydatów w formie siatki.
 - Każdy kandydat posiada opcje: "Akceptuj", "Odrzuć", "Edytuj".
 - Edycja kandydata odbywa się w oknie modalnym.
-- Możliwość wsadowego zapisu wszystkich zaakceptowanych i edytowanych fiszek do nowej lub istniejącej talii za pomocą jednego żądania.
+- Możliwość wsadowego zapisu wszystkich zaakceptowanych i edytowanych fiszek do wybranej talii za pomocą jednego żądania.
 - Wprowadzenie miesięcznego limitu na liczbę generacji fiszek przez AI dla każdego użytkownika.
 
 ### 3.5. Tryb nauki
@@ -146,6 +148,7 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 - Kryteria akceptacji:
     - W aplikacji dostępna jest dedykowana sekcja do generowania fiszek.
     - Pole tekstowe akceptuje tekst o długości od 500 do 10 000 znaków.
+    - Przed rozpoczęciem generowania muszę wybrać istniejącą talię lub utworzyć nową, do której zostaną przypisane fiszki.
     - Po wklejeniu tekstu i kliknięciu "Generuj" rozpoczyna się proces, a UI nie jest blokowane.
     - Po zakończeniu procesu jestem przekierowywany do widoku przeglądu fiszek-kandydatów.
 
@@ -157,16 +160,16 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
     - Każda fiszka-kandydat ma opcje "Akceptuj" (domyślnie zaznaczone), "Odrzuć" i "Edytuj".
     - Odrzucenie fiszki usuwa ją z listy kandydatów.
     - Kliknięcie "Edytuj" otwiera modal, w którym mogę zmienić treść awersu i rewersu.
+    - Sesja przeglądu jest zapisywana, dzięki czemu mogę opuścić widok i wrócić do niego później, nie tracąc postępów w akceptacji/edycji fiszek.
 
 ### ID: US-012
-- Tytuł: Zapisywanie zaakceptowanych fiszek
-- Opis: Jako użytkownik, po przejrzeniu kandydatów, chcę zapisać wszystkie zaakceptowane i edytowane fiszki do wybranej talii.
+- Tytuł: Zapisywanie wygenerowanych fiszek
+- Opis: Jako użytkownik, po przejrzeniu kandydatów, chcę zapisać wszystkie zaakceptowane i edytowane fiszki w talii wybranej przed generowaniem.
 - Kryteria akceptacji:
-    - W widoku przeglądu kandydatów mogę wybrać istniejącą talię z listy rozwijanej lub utworzyć nową "w locie".
-    - Przycisk "Zapisz" wysyła jedno żądanie do backendu ze wszystkimi fiszkami do zapisania.
+    - Przycisk "Zapisz" wysyła jedno żądanie do backendu ze wszystkimi zaakceptowanymi i edytowanymi fiszkami, które mają zostać zapisane.
     - Fiszki zaakceptowane bez zmian mają `source` ustawiony na `ai`.
     - Fiszki, które edytowałem, mają `source` ustawiony na `ai-edited`.
-    - Po zapisaniu jestem przekierowywany do widoku nowo zaktualizowanej/utworzonej talii.
+    - Po zapisaniu jestem przekierowany do widoku talii, w której zapisano fiszki.
 
 ### ID: US-013
 - Tytuł: Edycja istniejącej fiszki
