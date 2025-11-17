@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Migration: Create decks table
+    ============================================================================
+    Purpose: Create decks table to organize flashcards into collections
+    
+    Affected Objects:
+    - Table: decks
+    - Foreign Key: user_id → users(id)
+    - Unique Constraint: (user_id, name) for per-user unique deck names
+    
+    Key Features:
+    - Each deck belongs to exactly one user (private ownership)
+    - Deck names are case-sensitive and unique per user
+    - Names are trimmed and validated (non-empty, max 100 chars)
+    - CASCADE delete: removing user deletes all their decks
+    - Audit timestamps for tracking creation and modifications
+    
+    Business Rules:
+    - User cannot create two decks with the same name (case-sensitive)
+    - Deck names cannot be empty or whitespace-only
+    - Maximum deck name length: 100 characters
+    ============================================================================
+    -->
+
+    <changeSet id="202511030902-1" author="10xcards-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="decks"/>
+            </not>
+        </preConditions>
+        
+        <comment>Create decks table for organizing flashcards into collections</comment>
+        
+        <sql><![CDATA[
+            -- Create decks table
+            -- Decks are collections of flashcards owned by users
+            create table decks (
+                -- Primary identifier: UUID for security and scalability
+                id uuid primary key default gen_random_uuid(),
+                
+                -- Ownership: each deck belongs to exactly one user
+                -- on delete cascade: deleting user removes all their decks
+                user_id uuid not null,
+                
+                -- Deck name: case-sensitive, unique per user
+                -- application layer should trim whitespace before insert/update
+                name varchar(100) not null,
+                
+                -- Audit fields: track creation and modification times
+                created_at timestamp with time zone not null default current_timestamp,
+                updated_at timestamp with time zone not null default current_timestamp,
+                
+                -- Foreign key constraint to users table
+                constraint fk_decks_user_id 
+                    foreign key (user_id) 
+                    references users(id) 
+                    on delete cascade,
+                
+                -- Unique constraint: user cannot have duplicate deck names (case-sensitive)
+                constraint uq_decks_user_name 
+                    unique (user_id, name),
+                
+                -- Validation: deck name cannot be empty after trimming
+                constraint chk_decks_name_not_empty 
+                    check (length(trim(name)) > 0),
+                
+                -- Validation: deck name maximum length
+                constraint chk_decks_name_max_length 
+                    check (length(name) <= 100)
+            );
+            
+            -- Add table comment for documentation
+            comment on table decks is 
+                'Collections of flashcards owned by users';
+            
+            -- Add column comments for clarity
+            comment on column decks.id is 
+                'Unique deck identifier (UUID)';
+            comment on column decks.user_id is 
+                'Owner of this deck (FK to users)';
+            comment on column decks.name is 
+                'Deck name (case-sensitive, unique per user, trimmed by application)';
+            comment on column decks.created_at is 
+                'Timestamp when deck was created';
+            comment on column decks.updated_at is 
+                'Timestamp of last modification to deck metadata';
+        ]]></sql>
+        
+        <rollback><![CDATA[
+            -- Drop the decks table
+            -- WARNING: This is a destructive operation that will delete all decks
+            -- CASCADE will also delete related flashcards
+            drop table if exists decks cascade;
+        ]]></rollback>
+    </changeSet>
+
+</databaseChangeLog>
+

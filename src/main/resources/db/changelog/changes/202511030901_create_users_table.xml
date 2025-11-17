@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Migration: Create users table
+    ============================================================================
+    Purpose: Create the main users table for authentication and user management
+    
+    Affected Objects:
+    - Table: users
+    - Constraints: PK, unique email, CHECK constraints for validation
+    
+    Key Features:
+    - UUID primary keys for security and scalability
+    - Email-based authentication with password hashing (bcrypt via Spring Security)
+    - Role-based access control (RBAC)
+    - AI usage limits and tracking (monthly reset)
+    - Password reset token mechanism
+    - Email format validation at database level
+    - Audit timestamps (created_at, updated_at)
+    
+    Security Considerations:
+    - Passwords stored as bcrypt hash only
+    - Email uniqueness enforced at DB level
+    - Password reset tokens expire after 24 hours (enforced in application)
+    ============================================================================
+    -->
+
+    <changeSet id="202511030901-1" author="10xcards-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        
+        <comment>Create users table with authentication and AI limit tracking</comment>
+        
+        <sql><![CDATA[
+            -- Create users table
+            -- This is the core table for user management, authentication, and AI usage tracking
+            create table users (
+                -- Primary identifier: UUID for security (prevents enumeration attacks)
+                id uuid primary key default gen_random_uuid(),
+                
+                -- Authentication fields
+                email varchar(255) not null unique,
+                password_hash varchar(255) not null,
+                
+                -- Authorization and account status
+                role varchar(20) not null default 'USER',
+                enabled boolean not null default true,
+                
+                -- AI usage tracking
+                -- monthly_ai_limit: Maximum number of AI generations per month
+                -- ai_usage_in_current_month: Current month's usage counter (reset monthly)
+                monthly_ai_limit integer not null,
+                ai_usage_in_current_month integer not null default 0,
+                
+                -- Password reset mechanism
+                -- token is generated as secure random UUID, expires after 24 hours
+                password_reset_token varchar(255) null,
+                password_reset_token_expiry timestamp with time zone null,
+                
+                -- Audit fields
+                -- using timestamp with time zone for global consistency across timezones
+                created_at timestamp with time zone not null default current_timestamp,
+                updated_at timestamp with time zone not null default current_timestamp,
+                
+                -- Validation constraints
+                -- Ensure email has valid format (basic regex)
+                constraint chk_users_email_format 
+                    check (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+                
+                -- AI limits cannot be negative
+                constraint chk_users_monthly_ai_limit_non_negative 
+                    check (monthly_ai_limit >= 0),
+                
+                constraint chk_users_ai_usage_non_negative 
+                    check (ai_usage_in_current_month >= 0)
+            );
+            
+            -- Create unique index on email for fast lookups during authentication
+            -- This is automatically created by the unique constraint, but we make it explicit
+            create unique index idx_users_email on users(email);
+            
+            -- Add table comment for documentation
+            comment on table users is 
+                'Core user table with authentication, authorization, and AI usage tracking';
+            
+            -- Add column comments for clarity
+            comment on column users.id is 
+                'Unique user identifier (UUID for security)';
+            comment on column users.email is 
+                'User email address (login credential, must be unique)';
+            comment on column users.password_hash is 
+                'Bcrypt hashed password (handled by Spring Security)';
+            comment on column users.role is 
+                'User role for RBAC (e.g., USER, ADMIN)';
+            comment on column users.enabled is 
+                'Account activation status (false = account disabled)';
+            comment on column users.monthly_ai_limit is 
+                'Maximum AI generations allowed per month for this user';
+            comment on column users.ai_usage_in_current_month is 
+                'Current month AI generation usage counter (reset monthly by scheduled job)';
+            comment on column users.password_reset_token is 
+                'Secure token for password reset flow (null when not in use)';
+            comment on column users.password_reset_token_expiry is 
+                'Expiration timestamp for password reset token (24h validity)';
+        ]]></sql>
+        
+        <rollback><![CDATA[
+            -- Drop the users table
+            -- WARNING: This is a destructive operation that will delete all user data
+            -- CASCADE will also delete related records in decks, flashcards, and ai_generations
+            drop table if exists users cascade;
+        ]]></rollback>
+    </changeSet>
+
+</databaseChangeLog>
+

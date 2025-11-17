@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Migration: Create database indexes for query optimization
+    ============================================================================
+    Purpose: Create indexes to optimize common queries and improve performance
+    
+    Index Categories:
+    1. Foreign key indexes (JOIN optimization)
+    2. Chronological indexes (sorting by created_at)
+    3. Specialized indexes (hash lookup, source filtering)
+    4. Composite indexes (multi-column queries)
+    5. JSONB GIN indexes (JSON field searching)
+    
+    Affected Tables:
+    - decks
+    - flashcards
+    - ai_generations
+    
+    Key Query Patterns Optimized:
+    - User's decks list with chronological sorting
+    - Flashcards in deck with filtering and sorting
+    - AI generation history and metrics
+    - Duplicate source text detection
+    - Flashcard source analytics
+    
+    Note: Primary key and unique constraint indexes are created automatically
+    ============================================================================
+    -->
+
+    <!-- Foreign Key Indexes for JOIN optimization -->
+    
+    <changeSet id="202511030905-1" author="10xcards-system">
+        <comment>Create index on decks.user_id for fast user-to-decks JOINs</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that list all decks for a user
+            -- Query pattern: SELECT * FROM decks WHERE user_id = ?
+            -- Essential for: user dashboard, deck list views
+            create index idx_decks_user_id on decks(user_id);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_decks_user_id;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-2" author="10xcards-system">
+        <comment>Create index on flashcards.deck_id for fast deck-to-flashcards JOINs</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that list all flashcards in a deck
+            -- Query pattern: SELECT * FROM flashcards WHERE deck_id = ?
+            -- Essential for: flashcard list view, study session initialization
+            create index idx_flashcards_deck_id on flashcards(deck_id);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_flashcards_deck_id;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-3" author="10xcards-system">
+        <comment>Create index on flashcards.generation_id for AI metrics calculation</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that track flashcards from a generation
+            -- Query pattern: SELECT COUNT(*) FROM flashcards WHERE generation_id = ?
+            -- Essential for: acceptance rate metrics, AI generation effectiveness tracking
+            create index idx_flashcards_generation_id on flashcards(generation_id);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_flashcards_generation_id;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-4" author="10xcards-system">
+        <comment>Create index on ai_generations.user_id for user generation history</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that list user's AI generation history
+            -- Query pattern: SELECT * FROM ai_generations WHERE user_id = ?
+            -- Essential for: user AI usage dashboard, generation history views
+            create index idx_ai_generations_user_id on ai_generations(user_id);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_user_id;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-5" author="10xcards-system">
+        <comment>Create index on ai_generations.deck_id for deck-specific generation tracking</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that list generations for a specific deck
+            -- Query pattern: SELECT * FROM ai_generations WHERE deck_id = ?
+            -- Essential for: deck analytics, viewing AI contribution to specific deck
+            create index idx_ai_generations_deck_id on ai_generations(deck_id);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_deck_id;
+        ]]></rollback>
+    </changeSet>
+
+    <!-- Chronological Indexes for sorting -->
+
+    <changeSet id="202511030905-6" author="10xcards-system">
+        <comment>Create descending index on decks.created_at for chronological sorting</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that sort decks by creation time
+            -- Query pattern: SELECT * FROM decks WHERE user_id = ? ORDER BY created_at DESC
+            -- Essential for: displaying newest decks first in user dashboard
+            -- desc order: optimizes most common sort direction (newest first)
+            create index idx_decks_created_at on decks(created_at desc);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_decks_created_at;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-7" author="10xcards-system">
+        <comment>Create descending index on flashcards.created_at for chronological sorting</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that sort flashcards by creation time
+            -- Query pattern: SELECT * FROM flashcards WHERE deck_id = ? ORDER BY created_at DESC
+            -- Essential for: displaying newest flashcards first in deck view
+            -- desc order: optimizes most common sort direction (newest first)
+            create index idx_flashcards_created_at on flashcards(created_at desc);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_flashcards_created_at;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-8" author="10xcards-system">
+        <comment>Create descending index on ai_generations.created_at for chronological sorting</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that sort generations by creation time
+            -- Query pattern: SELECT * FROM ai_generations ORDER BY created_at DESC
+            -- Essential for: AI generation history view, analytics dashboards
+            -- desc order: optimizes most common sort direction (newest first)
+            create index idx_ai_generations_created_at on ai_generations(created_at desc);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_created_at;
+        ]]></rollback>
+    </changeSet>
+
+    <!-- Specialized Indexes -->
+
+    <changeSet id="202511030905-9" author="10xcards-system">
+        <comment>Create index on ai_generations.source_text_hash for duplicate detection</comment>
+        <sql><![CDATA[
+            -- Index for optimizing duplicate source text detection
+            -- Query pattern: SELECT * FROM ai_generations WHERE source_text_hash = ?
+            -- Essential for: preventing duplicate AI generations, user warning system
+            -- Use case: "You've already generated flashcards from this text"
+            create index idx_ai_generations_source_text_hash on ai_generations(source_text_hash);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_source_text_hash;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-10" author="10xcards-system">
+        <comment>Create index on flashcards.source for source-based filtering and metrics</comment>
+        <sql><![CDATA[
+            -- Index for optimizing queries that filter or aggregate by flashcard source
+            -- Query patterns: 
+            --   - SELECT * FROM flashcards WHERE source = 'ai'
+            --   - SELECT source, COUNT(*) FROM flashcards GROUP BY source
+            -- Essential for: AI contribution metrics (goal: 75% AI-generated flashcards)
+            create index idx_flashcards_source on flashcards(source);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_flashcards_source;
+        ]]></rollback>
+    </changeSet>
+
+    <!-- Composite Indexes for complex queries -->
+
+    <changeSet id="202511030905-11" author="10xcards-system">
+        <comment>Create composite index on flashcards(deck_id, source) for filtered deck queries</comment>
+        <sql><![CDATA[
+            -- Composite index for optimizing queries that filter flashcards by deck and source
+            -- Query pattern: SELECT * FROM flashcards WHERE deck_id = ? AND source = ?
+            -- Essential for: 
+            --   - "Show me AI-generated flashcards in this deck"
+            --   - Deck-specific source analytics
+            -- Note: covers both (deck_id) and (deck_id, source) query patterns
+            create index idx_flashcards_deck_source on flashcards(deck_id, source);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_flashcards_deck_source;
+        ]]></rollback>
+    </changeSet>
+
+    <changeSet id="202511030905-12" author="10xcards-system">
+        <comment>Create composite index on ai_generations(user_id, created_at) for user history with sorting</comment>
+        <sql><![CDATA[
+            -- Composite index for optimizing user generation history with chronological sorting
+            -- Query pattern: SELECT * FROM ai_generations WHERE user_id = ? ORDER BY created_at DESC
+            -- Essential for: user AI usage dashboard with timeline
+            -- desc on created_at: optimizes most common sort direction (newest first)
+            -- Note: covers both (user_id) and (user_id, created_at) query patterns
+            create index idx_ai_generations_user_created on ai_generations(user_id, created_at desc);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_user_created;
+        ]]></rollback>
+    </changeSet>
+
+    <!-- JSONB GIN Index for JSON field searching -->
+
+    <changeSet id="202511030905-13" author="10xcards-system">
+        <comment>Create GIN index on ai_generations.candidates for JSONB searching</comment>
+        <sql><![CDATA[
+            -- GIN index for efficient JSONB querying within candidates column
+            -- Query patterns:
+            --   - SELECT * FROM ai_generations WHERE candidates @> '[{"status": "accepted"}]'
+            --   - Search for specific candidate IDs or statuses within JSONB
+            -- Essential for: 
+            --   - Future advanced analytics on candidate acceptance patterns
+            --   - Searching generations by candidate attributes
+            -- Note: GIN indexes are larger but essential for JSONB containment queries
+            -- Optional for MVP: can be added later if needed for advanced features
+            create index idx_ai_generations_candidates_gin on ai_generations using gin(candidates);
+        ]]></sql>
+        <rollback><![CDATA[
+            drop index if exists idx_ai_generations_candidates_gin;
+        ]]></rollback>
+    </changeSet>
+
+</databaseChangeLog>

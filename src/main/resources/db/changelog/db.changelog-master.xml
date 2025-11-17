@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Master Changelog for 10xCards Database
+    ============================================================================
+    Purpose: Main changelog file that orchestrates all database migrations
+    
+    Migration Order:
+    1. Create ENUM types (flashcard_source_enum)
+    2. Create users table (no dependencies)
+    3. Create decks table (depends on users)
+    4. Create ai_generations table (depends on users and decks)
+    5. Create flashcards table (depends on decks and ai_generations)
+    6. Create all indexes for query optimization
+    
+    Tech Stack: PostgreSQL 12+, Liquibase 4.20+, Spring Boot 3.x
+    ============================================================================
+    -->
+
+    <!-- Include all changesets in order -->
+    <include file="db/changelog/changes/202511030900_create_flashcard_source_enum.xml"/>
+    <include file="db/changelog/changes/202511030901_create_users_table.xml"/>
+    <include file="db/changelog/changes/202511030902_create_decks_table.xml"/>
+    <include file="db/changelog/changes/202511030904_create_ai_generations_table.xml"/>
+    <include file="db/changelog/changes/202511030903_create_flashcards_table.xml"/>
+    <include file="db/changelog/changes/202511030905_create_indexes.xml"/>
+
+</databaseChangeLog>
+

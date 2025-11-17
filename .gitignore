@@ -31,3 +31,20 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Database ###
+# Local database backups
+*.sql
+*.dump
+
+# Local application properties overrides
+application-local.properties
+application-dev.properties
+
+# Environment variables
+.env
+.env.local
+
+### Docker ###
+# Docker volumes data (if mounted locally)
+postgres_data/

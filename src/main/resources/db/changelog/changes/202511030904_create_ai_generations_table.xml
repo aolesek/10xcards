@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Migration: Create ai_generations table
+    ============================================================================
+    Purpose: Track AI flashcard generation sessions with candidate review data
+    
+    Affected Objects:
+    - Table: ai_generations
+    - Foreign Keys:
+      * user_id → users(id) [CASCADE]
+      * deck_id → decks(id) [SET NULL]
+    - JSONB column for storing candidate flashcards
+    
+    Key Features:
+    - Track complete AI generation sessions
+    - Store metadata: model used, source text hash/length
+    - JSONB storage for candidate flashcards and their review status
+    - Support metrics calculation (acceptance rate, AI contribution)
+    - Preserve statistics even if deck is deleted (SET NULL)
+    
+    Business Rules:
+    - Source text: 500-10000 characters (per PRD requirements)
+    - Must generate at least one candidate flashcard
+    - Source text hash (SHA-256) for duplicate detection
+    - Candidates stored as JSONB with status tracking
+    
+    Metrics Support:
+    - Acceptance rate: (saved cards / generated candidates) × 100%
+    - AI contribution: percentage of flashcards from AI vs manual
+    ============================================================================
+    -->
+
+    <changeSet id="202511030904-1" author="10xcards-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_generations"/>
+            </not>
+        </preConditions>
+        
+        <comment>Create ai_generations table for tracking AI flashcard generation sessions</comment>
+        
+        <sql><![CDATA[
+            -- Create ai_generations table
+            -- Tracks AI generation sessions with candidate flashcards and review outcomes
+            create table ai_generations (
+                -- Primary identifier: UUID for security
+                id uuid primary key default gen_random_uuid(),
+                
+                -- User who requested this generation
+                -- on delete cascade: user deletion removes their generation history
+                user_id uuid not null,
+                
+                -- Target deck for generated flashcards (nullable for flexibility)
+                -- nullable because: deck may be deleted later but we keep statistics
+                -- on delete set null: preserve generation data even if deck is removed
+                deck_id uuid null,
+                
+                -- AI model information
+                -- store model name/version for tracking and future model comparisons
+                ai_model varchar(100) not null,
+                
+                -- Source text metadata (actual text not stored for privacy/storage)
+                -- hash enables duplicate detection without storing full text
+                -- length for analytics and validation
+                source_text_hash varchar(64) not null,
+                source_text_length integer not null,
+                
+                -- Generation output metadata
+                -- count of generated candidate flashcards
+                generated_candidates_count integer not null,
+                
+                -- Candidate flashcards with review status
+                -- stored as jsonb for flexibility and atomic operations
+                -- structure: array of objects with id, front, back, status, edited fields
+                -- example: [{"id": "uuid", "front": "Q", "back": "A", "status": "accepted"}]
+                candidates jsonb not null,
+                
+                -- Audit fields: track generation time and session updates
+                created_at timestamp with time zone not null default current_timestamp,
+                updated_at timestamp with time zone not null default current_timestamp,
+                
+                -- Foreign key to users table (mandatory, cascade delete)
+                constraint fk_ai_generations_user_id 
+                    foreign key (user_id) 
+                    references users(id) 
+                    on delete cascade,
+                
+                -- Foreign key to decks table (optional, set null on delete)
+                constraint fk_ai_generations_deck_id 
+                    foreign key (deck_id) 
+                    references decks(id) 
+                    on delete set null,
+                
+                -- Validation: source text length must be within allowed range (per PRD)
+                -- minimum 500 chars ensures enough content for meaningful flashcards
+                -- maximum 10000 chars prevents excessive processing time
+                constraint chk_ai_generations_source_length_range 
+                    check (source_text_length >= 500 and source_text_length <= 10000),
+                
+                -- Validation: must generate at least one candidate flashcard
+                constraint chk_ai_generations_candidates_count_positive 
+                    check (generated_candidates_count > 0)
+            );
+            
+            -- Add table comment for documentation
+            comment on table ai_generations is 
+                'AI flashcard generation sessions with candidate review data and metrics';
+            
+            -- Add column comments for clarity
+            comment on column ai_generations.id is 
+                'Unique generation session identifier (UUID)';
+            comment on column ai_generations.user_id is 
+                'User who requested generation (FK to users, cascade delete)';
+            comment on column ai_generations.deck_id is 
+                'Target deck for flashcards (FK to decks, nullable, set null on delete)';
+            comment on column ai_generations.ai_model is 
+                'Name/version of AI model used for generation (e.g., gpt-4, claude-3)';
+            comment on column ai_generations.source_text_hash is 
+                'SHA-256 hash of source text (for duplicate detection without storing full text)';
+            comment on column ai_generations.source_text_length is 
+                'Character count of source text (500-10000 per PRD)';
+            comment on column ai_generations.generated_candidates_count is 
+                'Number of candidate flashcards generated by AI';
+            comment on column ai_generations.candidates is 
+                'JSONB array of candidate flashcards with review status (accepted/rejected/edited)';
+            comment on column ai_generations.created_at is 
+                'Timestamp when generation was performed';
+            comment on column ai_generations.updated_at is 
+                'Timestamp of last update to review session (candidate status changes)';
+        ]]></sql>
+        
+        <rollback><![CDATA[
+            -- Drop the ai_generations table
+            -- WARNING: This is a destructive operation that will delete all AI generation history
+            -- Note: flashcards.generation_id will be set to null due to SET NULL constraint
+            drop table if exists ai_generations cascade;
+        ]]></rollback>
+    </changeSet>
+
+</databaseChangeLog>
+
