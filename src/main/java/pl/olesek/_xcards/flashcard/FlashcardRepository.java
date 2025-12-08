@@ -18,6 +18,15 @@ public interface FlashcardRepository extends JpaRepository<FlashcardEntity, UUID
 
     long countByDeckId(UUID deckId);
 
+    @Query("SELECT f.deck.id as deckId, COUNT(f) as count FROM FlashcardEntity f WHERE f.deck.id IN :deckIds GROUP BY f.deck.id")
+    List<FlashcardCountProjection> countByDeckIdIn(@Param("deckIds") List<UUID> deckIds);
+
     List<FlashcardEntity> findByGenerationId(UUID generationId);
+
+    interface FlashcardCountProjection {
+        UUID getDeckId();
+
+        Long getCount();
+    }
 }
 
