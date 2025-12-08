@@ -1,6 +1,7 @@
 package pl.olesek._xcards.flashcard;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -46,7 +47,8 @@ public class FlashcardEntity {
     @Column(name = "back", nullable = false, length = 500)
     private String back;
 
-    @Column(name = "source", nullable = false, columnDefinition = "flashcard_source_enum")
+    @Convert(converter = FlashcardSourceConverter.class)
+    @Column(name = "source", nullable = false, length = 20)
     private FlashcardSource source;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -18,6 +18,7 @@ import pl.olesek._xcards.auth.exception.UserAlreadyExistsException;
 import pl.olesek._xcards.common.dto.ErrorResponse;
 import pl.olesek._xcards.deck.exception.DeckAlreadyExistsException;
 import pl.olesek._xcards.deck.exception.DeckNotFoundException;
+import pl.olesek._xcards.flashcard.exception.FlashcardNotFoundException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -140,6 +141,17 @@ public class GlobalExceptionHandler {
 
         log.warn("Deck already exists: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(FlashcardNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleFlashcardNotFound(
+            FlashcardNotFoundException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                "Not Found", ex.getMessage(), request.getRequestURI());
+
+        log.warn("Flashcard not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

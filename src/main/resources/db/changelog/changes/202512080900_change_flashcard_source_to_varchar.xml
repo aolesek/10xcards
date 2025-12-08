@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    ============================================================================
+    Migration: Change flashcard source column from enum to varchar
+    ============================================================================
+    Purpose: Simplify source column type for better compatibility
+    
+    Change:
+    - Alter column 'source' from flashcard_source_enum to VARCHAR(20)
+    - Preserves existing data (enum values map directly to varchar)
+    - Maintains NOT NULL constraint
+    
+    Rationale:
+    - Simpler Hibernate integration (AttributeConverter works better)
+    - Easier testing (no custom enum type setup needed)
+    - Same functionality, less complexity
+    ============================================================================
+    -->
+
+    <changeSet id="202512080900-1" author="10xcards-system">
+        <comment>Change flashcard source column from enum to varchar</comment>
+        
+        <sql><![CDATA[
+            -- Change source column from enum to varchar(20)
+            -- PostgreSQL automatically casts enum values to text
+            ALTER TABLE flashcards 
+                ALTER COLUMN source TYPE VARCHAR(20) 
+                USING source::text;
+        ]]></sql>
+        
+        <rollback><![CDATA[
+            -- Rollback: convert back to enum
+            -- This assumes flashcard_source_enum still exists
+            ALTER TABLE flashcards 
+                ALTER COLUMN source TYPE flashcard_source_enum 
+                USING source::flashcard_source_enum;
+        ]]></rollback>
+    </changeSet>
+
+</databaseChangeLog>
+

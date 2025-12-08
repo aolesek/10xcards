@@ -30,6 +30,7 @@
     <include file="db/changelog/changes/202511030904_create_ai_generations_table.xml"/>
     <include file="db/changelog/changes/202511030903_create_flashcards_table.xml"/>
     <include file="db/changelog/changes/202511030905_create_indexes.xml"/>
+    <include file="db/changelog/changes/202512080900_change_flashcard_source_to_varchar.xml"/>
 
 </databaseChangeLog>
 
