@@ -18,3 +18,4 @@ public record DeckResponse(
         @Schema(description = "Timestamp when the deck was last updated", example = "2025-01-15T14:30:00Z")
         Instant updatedAt) {}
 
+

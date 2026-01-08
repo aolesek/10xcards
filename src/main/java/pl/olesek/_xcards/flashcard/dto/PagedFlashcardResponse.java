@@ -13,3 +13,4 @@ public record PagedFlashcardResponse(
         @Schema(description = "Pagination metadata")
         PageInfo page) {}
 
+

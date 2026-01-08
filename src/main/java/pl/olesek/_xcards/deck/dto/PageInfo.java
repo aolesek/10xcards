@@ -13,3 +13,4 @@ public record PageInfo(
         @Schema(description = "Total number of pages", example = "1")
         int totalPages) {}
 
+

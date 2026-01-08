@@ -11,3 +11,4 @@ public record UpdateDeckRequest(
         @Schema(description = "New name of the deck", example = "Advanced Biology")
         String name) {}
 
+

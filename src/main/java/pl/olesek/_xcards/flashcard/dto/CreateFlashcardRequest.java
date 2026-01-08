@@ -16,3 +16,4 @@ public record CreateFlashcardRequest(
         @Schema(description = "Back side of the flashcard", example = "Cell division process that produces two identical daughter cells", requiredMode = Schema.RequiredMode.REQUIRED)
         String back) {}
 
+

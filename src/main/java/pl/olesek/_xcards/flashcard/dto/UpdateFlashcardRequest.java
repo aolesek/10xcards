@@ -16,3 +16,4 @@ public record UpdateFlashcardRequest(
         @Schema(description = "Updated back side of the flashcard", example = "Cell division process that produces two genetically identical daughter cells from one parent cell", requiredMode = Schema.RequiredMode.REQUIRED)
         String back) {}
 
+

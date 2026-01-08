@@ -11,3 +11,4 @@ public record CreateDeckRequest(
         @Schema(description = "Name of the deck", example = "Biology 101")
         String name) {}
 
+

@@ -31,3 +31,4 @@ public record FlashcardResponse(
         @Schema(description = "Timestamp when the flashcard was last updated", example = "2025-01-15T10:00:00Z")
         Instant updatedAt) {}
 
+
