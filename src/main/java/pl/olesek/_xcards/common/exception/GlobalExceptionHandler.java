@@ -10,6 +10,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import pl.olesek._xcards.ai.exception.AIGenerationNotFoundException;
+import pl.olesek._xcards.ai.exception.AIServiceUnavailableException;
+import pl.olesek._xcards.ai.exception.ForbiddenException;
+import pl.olesek._xcards.ai.exception.InvalidCandidateUpdateException;
+import pl.olesek._xcards.ai.exception.MonthlyAILimitExceededException;
+import pl.olesek._xcards.ai.exception.NoAcceptedCandidatesException;
 import pl.olesek._xcards.auth.exception.InvalidCredentialsException;
 import pl.olesek._xcards.auth.exception.InvalidTokenException;
 import pl.olesek._xcards.auth.exception.RateLimitExceededException;
@@ -152,6 +158,73 @@ public class GlobalExceptionHandler {
 
         log.warn("Flashcard not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(AIGenerationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAIGenerationNotFound(
+            AIGenerationNotFoundException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                "Not Found", ex.getMessage(), request.getRequestURI());
+
+        log.warn("AI Generation not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(MonthlyAILimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMonthlyAILimitExceeded(
+            MonthlyAILimitExceededException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.FORBIDDEN.value(),
+                "Forbidden", ex.getMessage(), request.getRequestURI());
+
+        log.warn("Monthly AI limit exceeded: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(AIServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleAIServiceUnavailable(
+            AIServiceUnavailableException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(), "Service Unavailable", ex.getMessage(),
+                request.getRequestURI());
+
+        log.error("AI Service unavailable: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(InvalidCandidateUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCandidateUpdate(
+            InvalidCandidateUpdateException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Request", ex.getMessage(), request.getRequestURI());
+
+        log.warn("Invalid candidate update: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(NoAcceptedCandidatesException.class)
+    public ResponseEntity<ErrorResponse> handleNoAcceptedCandidates(
+            NoAcceptedCandidatesException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Request", ex.getMessage(), request.getRequestURI());
+
+        log.warn("No accepted candidates: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(Instant.now(), HttpStatus.FORBIDDEN.value(),
+                "Forbidden", ex.getMessage(), request.getRequestURI());
+
+        log.warn("Forbidden access attempt: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
