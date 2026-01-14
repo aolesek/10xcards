@@ -44,8 +44,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Service for managing AI-powered flashcard generation. Handles generation, retrieval, updates,
- * and saving of flashcard candidates.
+ * Service for managing AI-powered flashcard generation. Handles generation, retrieval, updates, and
+ * saving of flashcard candidates.
  */
 @Service
 @RequiredArgsConstructor

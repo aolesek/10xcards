@@ -32,8 +32,8 @@ import java.net.URI;
 import java.util.UUID;
 
 /**
- * REST controller for AI-powered flashcard generation. Provides endpoints for generating,
- * managing, and saving flashcard candidates.
+ * REST controller for AI-powered flashcard generation. Provides endpoints for generating, managing,
+ * and saving flashcard candidates.
  */
 @RestController
 @RequestMapping("/api/ai")

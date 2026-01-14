@@ -14,10 +14,13 @@ import pl.olesek._xcards.deck.dto.CreateDeckRequest;
 import pl.olesek._xcards.deck.dto.DeckResponse;
 import pl.olesek._xcards.deck.dto.PageInfo;
 import pl.olesek._xcards.deck.dto.PagedDeckResponse;
+import pl.olesek._xcards.deck.dto.StudyFlashcardDto;
+import pl.olesek._xcards.deck.dto.StudySessionResponse;
 import pl.olesek._xcards.deck.dto.UpdateDeckRequest;
 import pl.olesek._xcards.deck.exception.DeckAlreadyExistsException;
 import pl.olesek._xcards.deck.exception.DeckNotFoundException;
 import pl.olesek._xcards.deck.mapper.DeckMapper;
+import pl.olesek._xcards.flashcard.FlashcardEntity;
 import pl.olesek._xcards.flashcard.FlashcardRepository;
 import pl.olesek._xcards.flashcard.FlashcardRepository.FlashcardCountProjection;
 import pl.olesek._xcards.user.UserRepository;
@@ -137,6 +140,38 @@ public class DeckService {
         deckRepository.delete(deck);
 
         log.info("Deck deleted successfully: deckId={}, userId={}", deckId, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public StudySessionResponse getStudySession(UUID deckId, boolean shuffle, UUID userId) {
+        log.debug("Getting study session: deckId={}, userId={}, shuffle={}", deckId, userId, shuffle);
+
+        // Authorization check - single query for both existence and ownership verification
+        DeckEntity deck = deckRepository.findByIdAndUserId(deckId, userId)
+                .orElseThrow(() -> new DeckNotFoundException("Deck not found with id: " + deckId));
+
+        // Fetch flashcards with appropriate ordering
+        List<FlashcardEntity> flashcards = shuffle
+                ? flashcardRepository.findByDeckIdInRandomOrder(deckId)
+                : flashcardRepository.findByDeckIdOrderByCreatedAtDesc(deckId);
+
+        log.debug("Study session loaded: deckId={}, cardCount={}", deckId, flashcards.size());
+
+        // Monitor large datasets
+        if (flashcards.size() > 1000) {
+            log.warn("Large study session: deckId={}, cardCount={}", deckId, flashcards.size());
+        }
+
+        // Map to simplified DTOs
+        List<StudyFlashcardDto> flashcardDtos = flashcards.stream()
+                .map(f -> new StudyFlashcardDto(f.getId(), f.getFront(), f.getBack()))
+                .toList();
+
+        return new StudySessionResponse(
+                deck.getId(),
+                deck.getName(),
+                flashcardDtos.size(),
+                flashcardDtos);
     }
 
     private PagedDeckResponse createEmptyPagedResponse(Page<DeckEntity> page) {

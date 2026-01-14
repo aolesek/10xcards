@@ -324,8 +324,8 @@ class AIGenerationServiceTest {
         // When/Then
         assertThatThrownBy(
                 () -> aiGenerationService.updateCandidates(generationId, request, userId))
-                        .isInstanceOf(InvalidCandidateUpdateException.class)
-                        .hasMessageContaining("Candidate not found with id: " + nonExistentId);
+                .isInstanceOf(InvalidCandidateUpdateException.class)
+                .hasMessageContaining("Candidate not found with id: " + nonExistentId);
     }
 
     @Test
@@ -345,8 +345,8 @@ class AIGenerationServiceTest {
         // When/Then
         assertThatThrownBy(
                 () -> aiGenerationService.updateCandidates(generationId, request, userId))
-                        .isInstanceOf(InvalidCandidateUpdateException.class)
-                        .hasMessageContaining("editedFront is required when status is 'edited'");
+                .isInstanceOf(InvalidCandidateUpdateException.class)
+                .hasMessageContaining("editedFront is required when status is 'edited'");
     }
 
     // ==================== saveAcceptedCandidates Tests ====================

@@ -61,15 +61,16 @@ class AIClientServiceTest {
     void shouldGenerateCandidatesSuccessfully() throws Exception {
         // Given
         String sourceText = "Photosynthesis is the process by which plants convert light energy...";
-        String mockResponse = """
-                {
-                  "choices": [{
-                    "message": {
-                      "content": "[{\\"front\\": \\"What is photosynthesis?\\", \\"back\\": \\"Process of converting light energy\\"}]"
-                    }
-                  }]
-                }
-                """;
+        String mockResponse =
+                """
+                        {
+                          "choices": [{
+                            "message": {
+                              "content": "[{\\"front\\": \\"What is photosynthesis?\\", \\"back\\": \\"Process of converting light energy\\"}]"
+                            }
+                          }]
+                        }
+                        """;
 
         when(aiRestTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                 eq(String.class))).thenReturn(ResponseEntity.ok(mockResponse));
@@ -108,8 +109,8 @@ class AIClientServiceTest {
 
         when(aiRestTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                 eq(String.class)))
-                        .thenThrow(HttpServerErrorException.ServiceUnavailable.create(null, null,
-                                null, null, null));
+                .thenThrow(HttpServerErrorException.ServiceUnavailable.create(null, null,
+                        null, null, null));
 
         // When/Then
         assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText))

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.olesek._xcards.deck.dto.CreateDeckRequest;
 import pl.olesek._xcards.deck.dto.DeckResponse;
 import pl.olesek._xcards.deck.dto.PagedDeckResponse;
+import pl.olesek._xcards.deck.dto.StudySessionResponse;
 import pl.olesek._xcards.deck.dto.UpdateDeckRequest;
 import pl.olesek._xcards.deck.service.DeckService;
 
@@ -82,6 +83,26 @@ public class DeckController {
         log.debug("GET /api/decks/{} - userId: {}", deckId, userId);
 
         DeckResponse response = deckService.getDeckById(deckId, userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{deckId}/study")
+    @Operation(summary = "Get study session",
+            description = "Get flashcards for study session with optional randomization",
+            security = @SecurityRequirement(name = "bearer-jwt"))
+    @ApiResponses(value = {@ApiResponse(responseCode = "200",
+            description = "Study session retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Deck not found")})
+    public ResponseEntity<StudySessionResponse> getStudySession(@PathVariable UUID deckId,
+            @RequestParam(defaultValue = "true") boolean shuffle,
+            Authentication authentication) {
+
+        UUID userId = (UUID) authentication.getPrincipal();
+        log.debug("GET /api/decks/{}/study - userId: {}, shuffle: {}", deckId, userId,
+                shuffle);
+
+        StudySessionResponse response = deckService.getStudySession(deckId, shuffle, userId);
         return ResponseEntity.ok(response);
     }
 
