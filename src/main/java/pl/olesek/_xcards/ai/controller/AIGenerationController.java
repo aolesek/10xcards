@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +22,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import pl.olesek._xcards.ai.dto.request.GenerateFlashcardsRequest;
 import pl.olesek._xcards.ai.dto.request.UpdateCandidatesRequest;
 import pl.olesek._xcards.ai.dto.response.AIGenerationResponse;
+import pl.olesek._xcards.ai.dto.response.PagedAIGenerationResponse;
 import pl.olesek._xcards.ai.dto.response.SaveCandidatesResponse;
 import pl.olesek._xcards.ai.dto.response.UpdateCandidatesResponse;
 import pl.olesek._xcards.ai.service.AIGenerationService;
@@ -82,6 +87,39 @@ public class AIGenerationController {
 
         URI location = URI.create("/api/ai/generations/" + response.id());
         return ResponseEntity.created(location).body(response);
+    }
+
+    /**
+     * List all AI generation sessions for the authenticated user.
+     * 
+     * @param page page number (default 0)
+     * @param size page size (default 20)
+     * @param sort sort field and direction (default createdAt,desc)
+     * @param authentication the authenticated user
+     * @return 200 OK with paginated list of generation sessions
+     */
+    @GetMapping("/generations")
+    @Operation(summary = "List AI generation sessions",
+            description = "Get paginated list of all AI generation sessions for authenticated user",
+            security = @SecurityRequirement(name = "bearer-jwt"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Generation sessions retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
+    public ResponseEntity<PagedAIGenerationResponse> getAllGenerations(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            Authentication authentication) {
+
+        UUID userId = (UUID) authentication.getPrincipal();
+        log.debug("GET /api/ai/generations - userId: {}, page: {}, size: {}", userId, page, size);
+
+        size = Math.min(size, 100);
+        Pageable pageable = createPageable(page, size, sort);
+        PagedAIGenerationResponse response = aiGenerationService.getAllGenerations(userId, pageable);
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -187,5 +225,19 @@ public class AIGenerationController {
         SaveCandidatesResponse response =
                 aiGenerationService.saveAcceptedCandidates(generationId, userId);
         return ResponseEntity.status(201).body(response);
+    }
+
+    private Pageable createPageable(int page, int size, String sort) {
+        Sort.Direction direction = Sort.Direction.DESC;
+        String sortField = "createdAt";
+
+        if (sort.contains(",")) {
+            String[] sortParts = sort.split(",");
+            sortField = sortParts[0];
+            direction = sortParts[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
+        }
+
+        return PageRequest.of(page, size, Sort.by(direction, sortField));
     }
 }

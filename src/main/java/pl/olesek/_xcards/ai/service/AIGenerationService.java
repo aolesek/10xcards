@@ -12,6 +12,7 @@ import pl.olesek._xcards.ai.AIGenerationRepository;
 import pl.olesek._xcards.ai.dto.request.GenerateFlashcardsRequest;
 import pl.olesek._xcards.ai.dto.request.UpdateCandidatesRequest;
 import pl.olesek._xcards.ai.dto.response.AIGenerationResponse;
+import pl.olesek._xcards.ai.dto.response.PagedAIGenerationResponse;
 import pl.olesek._xcards.ai.dto.response.SaveCandidatesResponse;
 import pl.olesek._xcards.ai.dto.response.UpdateCandidatesResponse;
 import pl.olesek._xcards.ai.exception.AIGenerationNotFoundException;
@@ -345,8 +346,35 @@ public class AIGenerationService {
     }
 
     /**
-     * Verifies that the deck exists and belongs to the user.
+     * Get paginated list of AI generations for a user.
      * 
+     * @param userId the authenticated user ID
+     * @param pageable pagination parameters
+     * @return paginated list of AI generations
+     */
+    @Transactional(readOnly = true)
+    public PagedAIGenerationResponse getAllGenerations(UUID userId,
+            org.springframework.data.domain.Pageable pageable) {
+        log.debug("Fetching AI generations for user: {}, page: {}", userId,
+                pageable.getPageNumber());
+
+        org.springframework.data.domain.Page<AIGenerationEntity> page =
+                aiGenerationRepository.findByUserId(userId, pageable);
+
+        List<AIGenerationResponse> content =
+                page.getContent().stream().map(mapper::toResponse).toList();
+
+        pl.olesek._xcards.deck.dto.PageInfo pageInfo =
+                new pl.olesek._xcards.deck.dto.PageInfo(page.getNumber(), page.getSize(),
+                        page.getTotalElements(), page.getTotalPages());
+
+        log.debug("Found {} AI generations for user: {}", page.getTotalElements(), userId);
+        return new PagedAIGenerationResponse(content, pageInfo);
+    }
+
+    /**
+     * Verifies that the deck exists and belongs to the user.
+     *
      * @param deckId the deck ID to verify
      * @param userId the user ID to verify ownership
      * @return the deck entity if found and owned by user
