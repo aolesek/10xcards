@@ -1,13 +1,18 @@
 import type { ErrorResponseDto } from "@/lib/auth/authTypes";
 
 export class ApiError extends Error {
+  status: number;
+  data?: ErrorResponseDto;
+
   constructor(
-    public status: number,
-    public data?: ErrorResponseDto,
+    status: number,
+    data?: ErrorResponseDto,
     message?: string
   ) {
     super(message || data?.message || "API request failed");
     this.name = "ApiError";
+    this.status = status;
+    this.data = data;
   }
 }
 

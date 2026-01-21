@@ -74,6 +74,7 @@ export interface FieldErrors {
   password?: string;
   newPassword?: string;
   token?: string;
+  name?: string;
 }
 
 export type ApiErrorKind =

@@ -1,0 +1,112 @@
+import { fetchJson } from "./httpClient";
+import type {
+  PagedDeckResponseDto,
+  DeckResponseDto,
+  CreateDeckRequestDto,
+  UpdateDeckRequestDto,
+} from "@/lib/decks/deckTypes";
+
+const API_BASE = "/api/decks";
+
+/**
+ * Parameters for listing decks
+ */
+export interface ListDecksParams {
+  page?: number; // 0-based page number, default: 0
+  size?: number; // Page size, default: 100
+  sort?: string; // Sort criteria, e.g., "createdAt,desc"
+}
+
+/**
+ * List user's decks (paginated)
+ * @param accessToken - JWT access token
+ * @param params - Optional pagination and sorting parameters
+ * @throws ApiError with status 401 (unauthorized), 500 (server error)
+ */
+export async function listDecks(
+  accessToken: string,
+  params?: ListDecksParams
+): Promise<PagedDeckResponseDto> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page !== undefined) {
+    queryParams.append("page", params.page.toString());
+  }
+  
+  if (params?.size !== undefined) {
+    queryParams.append("size", params.size.toString());
+  }
+  
+  if (params?.sort) {
+    queryParams.append("sort", params.sort);
+  }
+  
+  const url = queryParams.toString()
+    ? `${API_BASE}?${queryParams.toString()}`
+    : API_BASE;
+  
+  return fetchJson<PagedDeckResponseDto>(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
+
+/**
+ * Create a new deck
+ * @param accessToken - JWT access token
+ * @param dto - Deck creation data
+ * @throws ApiError with status 400 (validation), 401 (unauthorized), 409 (duplicate name)
+ */
+export async function createDeck(
+  accessToken: string,
+  dto: CreateDeckRequestDto
+): Promise<DeckResponseDto> {
+  return fetchJson<DeckResponseDto>(API_BASE, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(dto),
+  });
+}
+
+/**
+ * Update an existing deck
+ * @param accessToken - JWT access token
+ * @param deckId - UUID of the deck to update
+ * @param dto - Deck update data
+ * @throws ApiError with status 400 (validation), 401 (unauthorized), 404 (not found), 409 (duplicate name)
+ */
+export async function updateDeck(
+  accessToken: string,
+  deckId: string,
+  dto: UpdateDeckRequestDto
+): Promise<DeckResponseDto> {
+  return fetchJson<DeckResponseDto>(`${API_BASE}/${deckId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(dto),
+  });
+}
+
+/**
+ * Delete a deck (also deletes all associated flashcards)
+ * @param accessToken - JWT access token
+ * @param deckId - UUID of the deck to delete
+ * @throws ApiError with status 401 (unauthorized), 404 (not found)
+ */
+export async function deleteDeck(
+  accessToken: string,
+  deckId: string
+): Promise<void> {
+  await fetchJson<void>(`${API_BASE}/${deckId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}

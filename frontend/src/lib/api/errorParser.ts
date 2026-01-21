@@ -1,4 +1,4 @@
-import type { FieldErrors, ErrorResponseDto } from "@/lib/auth/authTypes";
+import type { FieldErrors } from "@/lib/auth/authTypes";
 import { ApiError } from "./httpClient";
 
 /**
@@ -33,6 +33,8 @@ export function parseValidationErrors(message: string): FieldErrors | null {
           fieldErrors.newPassword = errorMessage;
         } else if (fieldName === "token") {
           fieldErrors.token = errorMessage;
+        } else if (fieldName === "name") {
+          fieldErrors.name = errorMessage;
         }
       }
     }

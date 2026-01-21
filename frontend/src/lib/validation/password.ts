@@ -6,8 +6,9 @@
  * - At least 1 digit (0-9)
  * - At least 1 special character from: @$!%*?&#
  * - Only allows: letters, digits, and @$!%*?&#
+ * 
+ * Full regex pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/
  */
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
 
 /**
  * Check if password contains only allowed characters (without requirement checks)
