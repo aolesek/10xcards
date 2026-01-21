@@ -5,6 +5,7 @@ import type {
   CreateDeckRequestDto,
   UpdateDeckRequestDto,
 } from "@/lib/decks/deckTypes";
+import type { StudySessionResponseDto } from "@/lib/study/studyTypes";
 
 const API_BASE = "/api/decks";
 
@@ -123,6 +124,30 @@ export async function deleteDeck(
 ): Promise<void> {
   await fetchJson<void>(`${API_BASE}/${deckId}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
+
+/**
+ * Get a study session for a deck
+ * GET /api/decks/{deckId}/study?shuffle=true
+ * @param accessToken - JWT access token
+ * @param deckId - UUID of the deck
+ * @param params - Optional query params
+ * @throws ApiError with status 401 (unauthorized), 403/404 (forbidden/not found), 500 (server error)
+ */
+export async function getStudySession(
+  accessToken: string,
+  deckId: string,
+  params?: { shuffle?: boolean }
+): Promise<StudySessionResponseDto> {
+  const queryParams = new URLSearchParams();
+  queryParams.append("shuffle", String(params?.shuffle ?? true));
+
+  return fetchJson<StudySessionResponseDto>(`${API_BASE}/${deckId}/study?${queryParams.toString()}`, {
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
