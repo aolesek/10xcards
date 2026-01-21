@@ -163,11 +163,19 @@ public class FlashcardController {
 
         if (sort.contains(",")) {
             String[] sortParts = sort.split(",");
-            sortField = sortParts[0];
-            direction = sortParts[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            sortField = sortParts[0].trim();
+            direction = sortParts[1].trim().equalsIgnoreCase("asc") ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
         }
 
-        return PageRequest.of(page, size, Sort.by(direction, sortField));
+        // Add secondary sort by ID to ensure stable ordering when primary field values are equal
+        Sort sortObj = Sort.by(direction, sortField).and(Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+
+        log.debug("Created Pageable: page={}, size={}, sort={} (field={}, direction={}) + secondary sort by id DESC",
+                page, size, sort, sortField, direction);
+
+        return pageable;
     }
 
     private FlashcardSource parseSourceParameter(String source) {
