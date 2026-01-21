@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,6 +29,7 @@ import pl.olesek._xcards.auth.dto.request.RefreshTokenRequest;
 import pl.olesek._xcards.auth.dto.request.RegisterRequest;
 import pl.olesek._xcards.auth.dto.response.AuthResponse;
 import pl.olesek._xcards.auth.dto.response.RefreshTokenResponse;
+import pl.olesek._xcards.auth.dto.response.UserInfoResponse;
 import pl.olesek._xcards.auth.service.AuthService;
 import pl.olesek._xcards.auth.service.PasswordResetService;
 import pl.olesek._xcards.common.dto.MessageResponse;
@@ -94,6 +96,18 @@ public class AuthController {
         log.debug("Logout request for user: {}", userId);
         authService.logout(userId, accessToken, null);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Get current user", description = "Returns information about the currently authenticated user",
+            security = @SecurityRequirement(name = "bearer-jwt"))
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "User info retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
+    public ResponseEntity<UserInfoResponse> getCurrentUser(Authentication authentication) {
+        UUID userId = (UUID) authentication.getPrincipal();
+        log.debug("Get current user request for: {}", userId);
+        UserInfoResponse response = authService.getCurrentUser(userId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/password-reset/request")

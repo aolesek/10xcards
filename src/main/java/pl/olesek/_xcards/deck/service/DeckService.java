@@ -40,8 +40,8 @@ public class DeckService {
 
     @Transactional(readOnly = true)
     public PagedDeckResponse getAllDecks(UUID userId, Pageable pageable) {
-        log.debug("Fetching decks for user: {}, page: {}, sort: {}", 
-                  userId, pageable.getPageNumber(), pageable.getSort());
+        log.debug("Fetching decks for user: {}, page: {}, sort: {}",
+                userId, pageable.getPageNumber(), pageable.getSort());
 
         Page<DeckEntity> page = deckRepository.findByUserId(userId, pageable);
 
@@ -52,9 +52,8 @@ public class DeckService {
 
         // Log deck order for debugging
         if (log.isDebugEnabled()) {
-            page.getContent().forEach(deck -> 
-                log.debug("Deck: id={}, name={}, createdAt={}", 
-                          deck.getId(), deck.getName(), deck.getCreatedAt()));
+            page.getContent().forEach(deck -> log.debug("Deck: id={}, name={}, createdAt={}",
+                    deck.getId(), deck.getName(), deck.getCreatedAt()));
         }
 
         // Prevent N+1: fetch flashcard counts for all decks in a single query

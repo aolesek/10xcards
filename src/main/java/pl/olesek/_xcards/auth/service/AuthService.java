@@ -12,6 +12,7 @@ import pl.olesek._xcards.auth.dto.request.RefreshTokenRequest;
 import pl.olesek._xcards.auth.dto.request.RegisterRequest;
 import pl.olesek._xcards.auth.dto.response.AuthResponse;
 import pl.olesek._xcards.auth.dto.response.RefreshTokenResponse;
+import pl.olesek._xcards.auth.dto.response.UserInfoResponse;
 import pl.olesek._xcards.auth.exception.InvalidCredentialsException;
 import pl.olesek._xcards.auth.exception.InvalidTokenException;
 import pl.olesek._xcards.auth.exception.RateLimitExceededException;
@@ -124,6 +125,19 @@ public class AuthService {
         }
 
         log.info("User logged out: {}", userId);
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponse getCurrentUser(UUID userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidTokenException("User not found"));
+
+        if (!user.getEnabled()) {
+            throw new AccountDisabledException("Account is disabled");
+        }
+
+        log.debug("Fetched current user info for: {}", userId);
+        return UserInfoResponse.from(user);
     }
 }
 

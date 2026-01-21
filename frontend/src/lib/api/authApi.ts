@@ -5,6 +5,7 @@ import type {
   PasswordResetRequestDto,
   PasswordResetConfirmDto,
   AuthResponseDto,
+  UserInfoResponseDto,
   MessageResponseDto,
 } from "@/lib/auth/authTypes";
 
@@ -58,5 +59,21 @@ export async function confirmPasswordReset(
   return fetchJson<MessageResponseDto>(`${API_BASE}/password-reset/confirm`, {
     method: "POST",
     body: JSON.stringify(dto),
+  });
+}
+
+/**
+ * Get current user information
+ * @param accessToken - JWT access token
+ * @throws ApiError with status 401 (unauthorized/invalid token)
+ */
+export async function getCurrentUser(
+  accessToken: string
+): Promise<UserInfoResponseDto> {
+  return fetchJson<UserInfoResponseDto>(`${API_BASE}/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
 }

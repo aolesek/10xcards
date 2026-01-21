@@ -44,17 +44,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Restore session from localStorage on mount
    */
   useEffect(() => {
-    const storedAccessToken = tokenStorage.getAccessToken();
-    const storedRefreshToken = tokenStorage.getRefreshToken();
+    const restoreSession = async () => {
+      const storedAccessToken = tokenStorage.getAccessToken();
+      const storedRefreshToken = tokenStorage.getRefreshToken();
 
-    if (storedAccessToken && storedRefreshToken) {
-      setAccessToken(storedAccessToken);
-      setRefreshToken(storedRefreshToken);
-      // Note: In a real app, you might want to validate the token
-      // or fetch user data from an endpoint here
-    }
+      if (storedAccessToken && storedRefreshToken) {
+        try {
+          // Fetch current user data from backend
+          const userInfo = await authApi.getCurrentUser(storedAccessToken);
+          
+          // Set auth state with stored tokens and fetched user data
+          const userData: User = {
+            id: userInfo.id,
+            email: userInfo.email,
+            role: userInfo.role,
+            monthlyAiLimit: userInfo.monthlyAiLimit,
+            aiUsageInCurrentMonth: userInfo.aiUsageInCurrentMonth,
+          };
+          
+          setUser(userData);
+          setAccessToken(storedAccessToken);
+          setRefreshToken(storedRefreshToken);
+          
+          console.debug("Session restored for user:", userInfo.email);
+        } catch (error) {
+          // If token is invalid or expired, clear stored tokens
+          console.error("Failed to restore session:", error);
+          tokenStorage.clearTokens();
+        }
+      }
 
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    restoreSession();
   }, []);
 
   /**

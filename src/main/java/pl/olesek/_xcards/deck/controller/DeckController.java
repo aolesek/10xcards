@@ -181,10 +181,10 @@ public class DeckController {
         // Add secondary sort by ID to ensure stable ordering when primary field values are equal
         Sort sortObj = Sort.by(direction, sortField).and(Sort.by(Sort.Direction.DESC, "id"));
         Pageable pageable = PageRequest.of(page, size, sortObj);
-        
-        log.debug("Created Pageable: page={}, size={}, sort={} (field={}, direction={}) + secondary sort by id DESC", 
-                  page, size, sort, sortField, direction);
-        
+
+        log.debug("Created Pageable: page={}, size={}, sort={} (field={}, direction={}) + secondary sort by id DESC",
+                page, size, sort, sortField, direction);
+
         return pageable;
     }
 }

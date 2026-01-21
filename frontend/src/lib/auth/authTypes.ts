@@ -31,6 +31,14 @@ export interface AuthResponseDto {
   refreshToken: string;
 }
 
+export interface UserInfoResponseDto {
+  id: string; // UUID
+  email: string;
+  role: string;
+  monthlyAiLimit: number;
+  aiUsageInCurrentMonth: number;
+}
+
 export interface MessageResponseDto {
   message: string;
 }
