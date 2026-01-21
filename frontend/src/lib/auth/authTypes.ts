@@ -83,6 +83,8 @@ export interface FieldErrors {
   newPassword?: string;
   token?: string;
   name?: string;
+  front?: string;
+  back?: string;
 }
 
 export type ApiErrorKind =

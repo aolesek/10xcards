@@ -4,6 +4,7 @@ import { RegisterView } from "@/views/auth/RegisterView";
 import { PasswordResetRequestView } from "@/views/auth/PasswordResetRequestView";
 import { PasswordResetConfirmView } from "@/views/auth/PasswordResetConfirmView";
 import { DecksView } from "@/views/DecksView";
+import { DeckDetailsView } from "@/views/DeckDetailsView";
 
 export const router = createBrowserRouter([
   {
@@ -29,5 +30,9 @@ export const router = createBrowserRouter([
   {
     path: "/decks",
     element: <DecksView />,
+  },
+  {
+    path: "/decks/:deckId",
+    element: <DeckDetailsView />,
   },
 ]);

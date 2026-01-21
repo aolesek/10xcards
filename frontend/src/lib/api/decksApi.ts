@@ -94,6 +94,24 @@ export async function updateDeck(
 }
 
 /**
+ * Get a single deck by ID
+ * @param accessToken - JWT access token
+ * @param deckId - UUID of the deck to retrieve
+ * @throws ApiError with status 401 (unauthorized), 404 (not found)
+ */
+export async function getDeck(
+  accessToken: string,
+  deckId: string
+): Promise<DeckResponseDto> {
+  return fetchJson<DeckResponseDto>(`${API_BASE}/${deckId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
+
+/**
  * Delete a deck (also deletes all associated flashcards)
  * @param accessToken - JWT access token
  * @param deckId - UUID of the deck to delete
