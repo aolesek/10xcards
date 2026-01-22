@@ -79,3 +79,76 @@ export interface AIGenerateNavigationState {
   deckId: string;
   sourceText: string; // raw text from textarea; loading view will trim + validate
 }
+
+/**
+ * Single candidate update for PATCH request
+ */
+export interface CandidateUpdateDto {
+  id: string; // UUID
+  status: "accepted" | "rejected" | "edited";
+  editedFront?: string | null;
+  editedBack?: string | null;
+}
+
+/**
+ * Request to update candidates statuses
+ */
+export interface UpdateCandidatesRequestDto {
+  candidates: CandidateUpdateDto[]; // non-empty array
+}
+
+/**
+ * Response from updating candidates
+ */
+export interface UpdateCandidatesResponseDto {
+  id: string; // generation ID
+  updatedCandidatesCount: number;
+  updatedAt: string; // ISO 8601
+}
+
+/**
+ * Response from saving candidates to deck
+ */
+export interface SaveCandidatesResponseDto {
+  savedCount: number;
+  flashcardIds: string[]; // UUIDs of created flashcards
+}
+
+/**
+ * Candidate view model for UI rendering
+ */
+export interface CandidateVm {
+  id: string;
+  front: string;
+  back: string;
+  status: CandidateStatusDto;
+  editedFront: string | null;
+  editedBack: string | null;
+  displayFront: string; // derived: editedFront ?? front
+  displayBack: string; // derived: editedBack ?? back
+}
+
+/**
+ * AI Review view model (generation with candidates)
+ */
+export interface AIReviewVm {
+  generationId: string;
+  deckId: string | null;
+  aiModel: string;
+  candidates: CandidateVm[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Edit candidate form state
+ */
+export interface EditCandidateFormVm {
+  editedFront: string;
+  editedBack: string;
+  errors?: {
+    editedFront?: string;
+    editedBack?: string;
+    formError?: string;
+  };
+}

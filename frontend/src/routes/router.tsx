@@ -8,6 +8,7 @@ import { DeckDetailsView } from "@/views/DeckDetailsView";
 import { StudyView } from "@/views/StudyView";
 import { AIGenerateView } from "@/views/ai/AIGenerateView";
 import { AILoadingView } from "@/views/ai/AILoadingView";
+import { AIReviewView } from "@/views/ai/AIReviewView";
 
 export const router = createBrowserRouter([
   {
@@ -49,5 +50,9 @@ export const router = createBrowserRouter([
   {
     path: "/ai/loading",
     element: <AILoadingView />,
+  },
+  {
+    path: "/ai/review/:generationId",
+    element: <AIReviewView />,
   },
 ]);
