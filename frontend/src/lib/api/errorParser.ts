@@ -39,6 +39,10 @@ export function parseValidationErrors(message: string): FieldErrors | null {
           fieldErrors.front = errorMessage;
         } else if (fieldName === "back") {
           fieldErrors.back = errorMessage;
+        } else if (fieldName === "deckId") {
+          fieldErrors.deckId = errorMessage;
+        } else if (fieldName === "sourceText") {
+          fieldErrors.sourceText = errorMessage;
         }
       }
     }

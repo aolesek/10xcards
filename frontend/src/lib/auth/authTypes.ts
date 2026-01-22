@@ -85,6 +85,8 @@ export interface FieldErrors {
   name?: string;
   front?: string;
   back?: string;
+  deckId?: string;
+  sourceText?: string;
 }
 
 export type ApiErrorKind =
