@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { InlineError } from "@/components/auth/InlineError";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/useAuth";
 import { generateFlashcards } from "@/lib/api/aiApi";
@@ -140,6 +141,11 @@ export function AILoadingView() {
     <ProtectedRoute>
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <div className="space-y-8">
+          {/* User menu */}
+          <div className="flex justify-end">
+            <UserMenu />
+          </div>
+
           {/* Loading state */}
           {isLoading && mode === "loading" && (
             <div className="space-y-6">

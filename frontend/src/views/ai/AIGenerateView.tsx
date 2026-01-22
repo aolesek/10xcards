@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { InlineError } from "@/components/auth/InlineError";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { useAuth } from "@/lib/auth/useAuth";
 import { listDecks } from "@/lib/api/decksApi";
 import { getErrorMessage } from "@/lib/api/errorParser";
@@ -20,6 +21,7 @@ import type { DeckResponseDto } from "@/lib/decks/deckTypes";
 export function AIGenerateView() {
   const { accessToken, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Deck options state
   const [deckOptions, setDeckOptions] = useState<DeckOptionVm[]>([]);
@@ -63,6 +65,12 @@ export function AIGenerateView() {
       }));
 
       setDeckOptions(options);
+
+      // Pre-select deck from query param if provided
+      const preselectedDeckId = searchParams.get("deckId");
+      if (preselectedDeckId && options.some((opt) => opt.value === preselectedDeckId)) {
+        setForm((prev) => ({ ...prev, deckId: preselectedDeckId }));
+      }
     } catch (err) {
       // Handle 401 - session expired
       if (err instanceof ApiError && err.status === 401) {
@@ -75,7 +83,7 @@ export function AIGenerateView() {
     } finally {
       setIsDecksLoading(false);
     }
-  }, [accessToken, logout]);
+  }, [accessToken, logout, searchParams]);
 
   // Fetch decks on mount
   useEffect(() => {
@@ -164,6 +172,11 @@ export function AIGenerateView() {
     <ProtectedRoute>
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <div className="space-y-6">
+          {/* User menu */}
+          <div className="flex justify-end">
+            <UserMenu />
+          </div>
+
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">Generuj fiszki (AI)</h1>

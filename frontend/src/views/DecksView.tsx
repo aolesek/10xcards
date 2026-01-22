@@ -115,6 +115,13 @@ export function DecksView() {
   }, []);
 
   /**
+   * Navigate to AI generate view
+   */
+  const handleAiGenerateClick = useCallback(() => {
+    navigate("/ai/generate");
+  }, [navigate]);
+
+  /**
    * Open edit dialog
    */
   const handleEditClick = useCallback((deck: DeckListItemVm) => {
@@ -166,6 +173,7 @@ export function DecksView() {
           {/* Header */}
           <DecksHeader
             onCreateClick={handleCreateClick}
+            onAiGenerateClick={handleAiGenerateClick}
             isDisabled={isLoading}
           />
 

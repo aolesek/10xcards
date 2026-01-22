@@ -198,6 +198,14 @@ export function DeckDetailsView() {
   }, [deckId, navigate]);
 
   /**
+   * Navigate to AI generate view with pre-selected deck
+   */
+  const handleAiGenerateClick = useCallback(() => {
+    if (!deckId) return;
+    navigate(`/ai/generate?deckId=${deckId}`);
+  }, [deckId, navigate]);
+
+  /**
    * Retry fetching data
    */
   const handleRetry = useCallback(() => {
@@ -247,6 +255,7 @@ export function DeckDetailsView() {
                 flashcardCount={deck.flashcardCount}
                 onCreateClick={handleCreateClick}
                 onStudyClick={handleStudyClick}
+                onAiGenerateClick={handleAiGenerateClick}
                 isDisabled={false}
               />
 
