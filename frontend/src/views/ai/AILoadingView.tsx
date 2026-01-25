@@ -30,7 +30,7 @@ export function AILoadingView() {
     const state = location.state as AIGenerateNavigationState | null;
 
     // Redirect if no state
-    if (!state || !state.deckId || !state.sourceText) {
+    if (!state || !state.deckId || !state.sourceText || !state.requestedCandidatesCount) {
       navigate("/ai/generate", { replace: true });
       return;
     }
@@ -47,6 +47,7 @@ export function AILoadingView() {
     const validationErrors = validateGenerateForm({
       deckId: state.deckId,
       sourceText: state.sourceText,
+      requestedCandidatesCount: state.requestedCandidatesCount,
     });
 
     if (Object.keys(validationErrors).length > 0) {
@@ -64,6 +65,7 @@ export function AILoadingView() {
       const response = await generateFlashcards(accessToken, {
         deckId: state.deckId,
         sourceText: state.sourceText.trim(),
+        requestedCandidatesCount: state.requestedCandidatesCount,
       });
 
       // Navigate to review page on success

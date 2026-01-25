@@ -25,5 +25,16 @@ export function validateGenerateForm(form: AIGenerateFormVm): AIGenerateFormErro
     errors.sourceText = "Tekst może mieć maksymalnie 10 000 znaków";
   }
 
+  // Validate requestedCandidatesCount
+  if (typeof form.requestedCandidatesCount !== "number" || isNaN(form.requestedCandidatesCount)) {
+    errors.requestedCandidatesCount = "Podaj liczbę fiszek";
+  } else if (!Number.isInteger(form.requestedCandidatesCount)) {
+    errors.requestedCandidatesCount = "Liczba fiszek musi być liczbą całkowitą";
+  } else if (form.requestedCandidatesCount < 1) {
+    errors.requestedCandidatesCount = "Minimum 1 fiszka";
+  } else if (form.requestedCandidatesCount > 100) {
+    errors.requestedCandidatesCount = "Maksymalnie 100 fiszek";
+  }
+
   return errors;
 }

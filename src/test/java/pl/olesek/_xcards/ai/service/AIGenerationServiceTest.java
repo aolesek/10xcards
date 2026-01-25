@@ -139,7 +139,7 @@ class AIGenerationServiceTest {
     void shouldGenerateFlashcardsSuccessfully() {
         // Given
         String sourceText = "Photosynthesis is the process...";
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, sourceText);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, sourceText, 10);
 
         when(deckRepository.findByIdAndUserId(deckId, userId))
                 .thenReturn(Optional.of(testDeck));
@@ -147,7 +147,7 @@ class AIGenerationServiceTest {
                 .thenReturn(true);
         when(aiGenerationRepository.findByUserIdOrderByCreatedAtDesc(userId))
                 .thenReturn(List.of());
-        when(aiClientService.generateCandidatesFromText(anyString())).thenReturn(testCandidates);
+        when(aiClientService.generateCandidatesFromText(anyString(), anyInt())).thenReturn(testCandidates);
         when(mapper.serializeCandidates(any())).thenReturn(candidatesJson);
         when(aiGenerationRepository.save(any(AIGenerationEntity.class)))
                 .thenReturn(testGeneration);
@@ -166,7 +166,7 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenDeckNotFound() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text");
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
 
         when(deckRepository.findByIdAndUserId(deckId, userId)).thenReturn(Optional.empty());
         when(deckRepository.existsById(deckId)).thenReturn(false);
@@ -180,7 +180,7 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowForbiddenWhenDeckBelongsToAnotherUser() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text");
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
 
         when(deckRepository.findByIdAndUserId(deckId, userId)).thenReturn(Optional.empty());
         when(deckRepository.existsById(deckId)).thenReturn(true);
@@ -194,7 +194,7 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenRateLimitExceeded() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text");
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
 
         when(deckRepository.findByIdAndUserId(deckId, userId))
                 .thenReturn(Optional.of(testDeck));
@@ -210,7 +210,7 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenMonthlyLimitExceeded() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text");
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
 
         // Create 100 generations from this month
         List<AIGenerationEntity> generations =

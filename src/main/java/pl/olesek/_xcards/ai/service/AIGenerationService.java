@@ -105,10 +105,15 @@ public class AIGenerationService {
         String sourceTextHash = hashSourceText(trimmedText);
         int sourceTextLength = trimmedText.length();
 
-        // 5. Call AI service to generate candidates
-        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(trimmedText);
+        // 5. Determine requested count (default to 10 if null)
+        int requestedCount = request.requestedCandidatesCount() != null 
+                ? request.requestedCandidatesCount() 
+                : 10;
 
-        // 6. Create AIGenerationEntity
+        // 6. Call AI service to generate candidates
+        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(trimmedText, requestedCount);
+
+        // 7. Create AIGenerationEntity
         AIGenerationEntity entity = new AIGenerationEntity();
         entity.setUser(deck.getUser());
         entity.setDeck(deck);
@@ -118,13 +123,13 @@ public class AIGenerationService {
         entity.setGeneratedCandidatesCount(candidates.size());
         entity.setCandidates(mapper.serializeCandidates(candidates));
 
-        // 7. Save to database
+        // 8. Save to database
         AIGenerationEntity saved = aiGenerationRepository.save(entity);
 
         log.info("Generated {} candidates for user={}, generationId={}", candidates.size(), userId,
                 saved.getId());
 
-        // 8. Return mapped response
+        // 9. Return mapped response
         return mapper.toResponse(saved);
     }
 

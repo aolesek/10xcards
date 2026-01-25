@@ -25,6 +25,7 @@ export interface AIGenerationCandidateDto {
 export interface GenerateFlashcardsRequestDto {
   deckId: string; // UUID
   sourceText: string; // 500-10000 characters after trim
+  requestedCandidatesCount: number; // 1-100, default 10
 }
 
 /**
@@ -61,6 +62,7 @@ export interface DeckOptionVm {
 export interface AIGenerateFormVm {
   deckId: string | "";
   sourceText: string;
+  requestedCandidatesCount: number;
 }
 
 /**
@@ -69,6 +71,7 @@ export interface AIGenerateFormVm {
 export interface AIGenerateFormErrorsVm {
   deckId?: string;
   sourceText?: string;
+  requestedCandidatesCount?: string;
   formError?: string | null;
 }
 
@@ -78,6 +81,7 @@ export interface AIGenerateFormErrorsVm {
 export interface AIGenerateNavigationState {
   deckId: string;
   sourceText: string; // raw text from textarea; loading view will trim + validate
+  requestedCandidatesCount: number;
 }
 
 /**

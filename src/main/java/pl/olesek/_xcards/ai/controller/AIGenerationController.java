@@ -52,14 +52,15 @@ public class AIGenerationController {
     /**
      * Generate flashcard candidates from source text using AI.
      * 
-     * @param request the generation request containing deckId and sourceText
+     * @param request the generation request containing deckId, sourceText, and requestedCandidatesCount
      * @param authentication the authenticated user
      * @return 201 Created with generation session and candidates
      */
     @PostMapping("/generate")
     @Operation(summary = "Generate flashcard candidates",
-            description = "Generate 8-12 flashcard candidates from source text using AI. "
+            description = "Generate flashcard candidates from source text using AI. "
                     + "Requires 500-10000 characters of text. "
+                    + "Number of candidates is configurable (1-100, default 10). "
                     + "Subject to rate limiting (10 requests/minute) and monthly limit (100 generations/month).",
             security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses(value = {
@@ -80,8 +81,9 @@ public class AIGenerationController {
             Authentication authentication) {
 
         UUID userId = (UUID) authentication.getPrincipal();
-        log.debug("POST /api/ai/generate - userId: {}, deckId: {}, textLength: {}", userId,
-                request.deckId(), request.sourceText().length());
+        log.debug("POST /api/ai/generate - userId: {}, deckId: {}, textLength: {}, requestedCount: {}", 
+                userId, request.deckId(), request.sourceText().length(), 
+                request.requestedCandidatesCount());
 
         AIGenerationResponse response = aiGenerationService.generateFlashcards(request, userId);
 

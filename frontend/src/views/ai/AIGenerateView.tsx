@@ -32,6 +32,7 @@ export function AIGenerateView() {
   const [form, setForm] = useState<AIGenerateFormVm>({
     deckId: "",
     sourceText: "",
+    requestedCandidatesCount: 10,
   });
   const [errors, setErrors] = useState<AIGenerateFormErrorsVm>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,6 +108,14 @@ export function AIGenerateView() {
   }, []);
 
   /**
+   * Handle requested candidates count change
+   */
+  const handleRequestedCandidatesCountChange = useCallback((value: number) => {
+    setForm((prev) => ({ ...prev, requestedCandidatesCount: value }));
+    setErrors((prev) => ({ ...prev, requestedCandidatesCount: undefined }));
+  }, []);
+
+  /**
    * Handle open create deck dialog
    */
   const handleOpenCreateDeckDialog = useCallback(() => {
@@ -156,6 +165,7 @@ export function AIGenerateView() {
     const navState: AIGenerateNavigationState = {
       deckId: form.deckId,
       sourceText: form.sourceText,
+      requestedCandidatesCount: form.requestedCandidatesCount,
     };
 
     navigate("/ai/loading", { state: navState });
@@ -211,6 +221,7 @@ export function AIGenerateView() {
               isSubmitting={isSubmitting}
               onDeckChange={handleDeckChange}
               onSourceTextChange={handleSourceTextChange}
+              onRequestedCandidatesCountChange={handleRequestedCandidatesCountChange}
               onOpenCreateDeckDialog={handleOpenCreateDeckDialog}
               onSubmit={handleSubmit}
             />

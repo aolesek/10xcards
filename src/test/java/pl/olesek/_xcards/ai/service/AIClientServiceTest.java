@@ -47,7 +47,7 @@ class AIClientServiceTest {
     private String mockBaseUrl = "https://openrouter.ai/api/v1";
     private String mockModel = "openai/gpt-4";
     private String mockPromptTemplate =
-            "Generate 8-12 flashcard question-answer pairs from the following text. Return JSON array with format: [{\"front\": \"question\", \"back\": \"answer\"}]. Text: {text}";
+            "Generate {count} flashcard question-answer pairs from the following text. Return JSON array with format: [{\"front\": \"question\", \"back\": \"answer\"}]. Text: {text}";
 
     @BeforeEach
     void setUp() {
@@ -76,7 +76,7 @@ class AIClientServiceTest {
                 eq(String.class))).thenReturn(ResponseEntity.ok(mockResponse));
 
         // When
-        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(sourceText);
+        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(sourceText, 10);
 
         // Then
         assertThat(candidates).isNotNull();
@@ -93,7 +93,7 @@ class AIClientServiceTest {
                 eq(String.class))).thenThrow(new ResourceAccessException("Connection timeout"));
 
         // When/Then
-        assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText))
+        assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText, 10))
                 .isInstanceOf(AIServiceUnavailableException.class)
                 .hasMessageContaining("AI service is currently unavailable");
 
@@ -113,7 +113,7 @@ class AIClientServiceTest {
                         null, null, null));
 
         // When/Then
-        assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText))
+        assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText, 10))
                 .isInstanceOf(AIServiceUnavailableException.class);
 
         // Verify retry logic
@@ -142,7 +142,7 @@ class AIClientServiceTest {
                 eq(String.class))).thenReturn(ResponseEntity.ok(mockResponse));
 
         // When
-        aiClientService.generateCandidatesFromText(sourceText);
+        aiClientService.generateCandidatesFromText(sourceText, 10);
 
         // Then
         verify(aiRestTemplate).exchange(anyString(), eq(HttpMethod.POST), entityCaptor.capture(),
@@ -174,7 +174,7 @@ class AIClientServiceTest {
                 eq(String.class))).thenReturn(ResponseEntity.ok(mockResponseWithMarkdown));
 
         // When/Then - Should not throw exception
-        aiClientService.generateCandidatesFromText(sourceText);
+        aiClientService.generateCandidatesFromText(sourceText, 10);
 
         verify(aiRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                 eq(String.class));
