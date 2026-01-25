@@ -52,21 +52,22 @@ public class AIClientService {
 
     private static final int MAX_RETRIES = 2;
     private static final long RETRY_DELAY_MS = 1000;
-
+    
     /**
      * Generates flashcard candidates from source text using AI. Includes retry logic for handling
      * transient failures.
      * 
      * @param sourceText the text to generate flashcards from
+     * @param requestedCount the number of flashcard candidates to generate (1-100)
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
      */
-    public List<CandidateModel> generateCandidatesFromText(String sourceText) {
-        log.debug("Calling OpenRouter API with model={}", model);
+    public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount) {
+        log.debug("Calling OpenRouter API with model={}, requestedCount={}", model, requestedCount);
 
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
-                return callOpenRouterAPI(sourceText);
+                return callOpenRouterAPI(sourceText, requestedCount);
             } catch (ResourceAccessException | HttpServerErrorException e) {
                 log.warn("OpenRouter API attempt {} failed: {}", attempt + 1, e.getMessage());
 
@@ -95,10 +96,13 @@ public class AIClientService {
      * Makes the actual HTTP call to OpenRouter API.
      * 
      * @param sourceText the text to generate flashcards from
+     * @param requestedCount the number of flashcard candidates to generate
      * @return list of candidate models
      */
-    private List<CandidateModel> callOpenRouterAPI(String sourceText) {
-        String prompt = promptTemplate.replace("{text}", sourceText);
+    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount) {
+        String prompt = promptTemplate
+                .replace("{text}", sourceText)
+                .replace("{count}", String.valueOf(requestedCount));
 
         // Build request body according to OpenRouter API specification
         Map<String, Object> requestBody = new HashMap<>();
@@ -153,10 +157,10 @@ public class AIClientService {
             List<Map<String, String>> rawCandidates =
                     objectMapper.readValue(jsonContent, new TypeReference<>() {});
 
-            // Convert to CandidateModel with UUIDs and status
+            // Convert to CandidateModel with UUIDs and status (default: accepted per PRD)
             return rawCandidates.stream()
                     .map(raw -> new CandidateModel(UUID.randomUUID(), raw.get("front"),
-                            raw.get("back"), "pending", null, null))
+                            raw.get("back"), "accepted", null, null))
                     .toList();
 
         } catch (Exception e) {
