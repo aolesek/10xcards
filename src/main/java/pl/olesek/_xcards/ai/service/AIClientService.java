@@ -52,10 +52,10 @@ public class AIClientService {
 
     private static final int MAX_RETRIES = 2;
     private static final long RETRY_DELAY_MS = 1000;
-    
+
     /**
-     * Generates flashcard candidates from source text using AI with default model.
-     * Includes retry logic for handling transient failures.
+     * Generates flashcard candidates from source text using AI with default model. Includes retry logic
+     * for handling transient failures.
      * 
      * @param sourceText the text to generate flashcards from
      * @param requestedCount the number of flashcard candidates to generate (1-100)

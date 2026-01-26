@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Enum representing allowed AI models for flashcard generation.
- * Provides a single source of truth for model validation on the backend.
+ * Enum representing allowed AI models for flashcard generation. Provides a single source of truth
+ * for model validation on the backend.
  */
 @Getter
 @RequiredArgsConstructor
 public enum AIModel {
-    
+
     GPT_4O_MINI("openai/gpt-4o-mini"),
     GPT_5_MINI("openai/gpt-5-mini"),
     GEMINI_2_5_FLASH("google/gemini-2.5-flash"),
@@ -38,13 +38,13 @@ public enum AIModel {
         if (id == null) {
             return null;
         }
-        
+
         for (AIModel model : values()) {
             if (model.id.equals(id)) {
                 return model;
             }
         }
-        
+
         return null;
     }
 }

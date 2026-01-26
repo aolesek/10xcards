@@ -107,13 +107,13 @@ public class AIGenerationService {
         int sourceTextLength = trimmedText.length();
 
         // 5. Determine requested count (default to 10 if null)
-        int requestedCount = request.requestedCandidatesCount() != null 
-                ? request.requestedCandidatesCount() 
+        int requestedCount = request.requestedCandidatesCount() != null
+                ? request.requestedCandidatesCount()
                 : 10;
 
         // 6. Determine selected model (use from request or default)
-        AIModel selectedModel = request.model() != null 
-                ? request.model() 
+        AIModel selectedModel = request.model() != null
+                ? request.model()
                 : AIModel.DEFAULT;
         String selectedModelId = selectedModel.getId();
 
@@ -136,7 +136,7 @@ public class AIGenerationService {
         // 9. Save to database
         AIGenerationEntity saved = aiGenerationRepository.save(entity);
 
-        log.info("Generated {} candidates for user={}, generationId={}, model={}", 
+        log.info("Generated {} candidates for user={}, generationId={}, model={}",
                 candidates.size(), userId, saved.getId(), selectedModelId);
 
         // 10. Return mapped response

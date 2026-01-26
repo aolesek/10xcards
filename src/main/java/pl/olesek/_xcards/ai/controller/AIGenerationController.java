@@ -81,8 +81,8 @@ public class AIGenerationController {
             Authentication authentication) {
 
         UUID userId = (UUID) authentication.getPrincipal();
-        log.debug("POST /api/ai/generate - userId: {}, deckId: {}, textLength: {}, requestedCount: {}", 
-                userId, request.deckId(), request.sourceText().length(), 
+        log.debug("POST /api/ai/generate - userId: {}, deckId: {}, textLength: {}, requestedCount: {}",
+                userId, request.deckId(), request.sourceText().length(),
                 request.requestedCandidatesCount());
 
         AIGenerationResponse response = aiGenerationService.generateFlashcards(request, userId);
