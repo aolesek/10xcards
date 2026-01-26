@@ -5,6 +5,7 @@ import type {
   UpdateCandidatesRequestDto,
   UpdateCandidatesResponseDto,
   SaveCandidatesResponseDto,
+  PagedAIGenerationResponseDto,
 } from "@/lib/ai/aiTypes";
 
 const API_BASE = "/api/ai";
@@ -108,4 +109,35 @@ export async function saveAICandidates(
       signal,
     }
   );
+}
+
+/**
+ * List all AI generations for current user (paginated)
+ * GET /api/ai/generations
+ * @param accessToken - JWT access token
+ * @param params - Optional query parameters (page, size, sort)
+ * @param signal - Optional AbortSignal for request cancellation
+ * @throws ApiError with status 401 (unauthorized)
+ */
+export async function listAIGenerations(
+  accessToken: string,
+  params?: { page?: number; size?: number; sort?: string },
+  signal?: AbortSignal
+): Promise<PagedAIGenerationResponseDto> {
+  const queryParams = new URLSearchParams();
+  if (params?.page !== undefined) queryParams.set("page", params.page.toString());
+  if (params?.size !== undefined) queryParams.set("size", params.size.toString());
+  if (params?.sort) queryParams.set("sort", params.sort);
+
+  const url = queryParams.toString()
+    ? `${API_BASE}/generations?${queryParams.toString()}`
+    : `${API_BASE}/generations`;
+
+  return fetchJson<PagedAIGenerationResponseDto>(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    signal,
+  });
 }

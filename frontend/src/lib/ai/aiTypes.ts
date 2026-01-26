@@ -162,3 +162,50 @@ export interface EditCandidateFormVm {
     formError?: string;
   };
 }
+
+// ============================================================================
+// AI Generations History Types
+// ============================================================================
+
+/**
+ * Paged AI Generation response from API
+ */
+export interface PagedAIGenerationResponseDto {
+  content: AIGenerationResponseDto[];
+  page: PageMetaDto;
+}
+
+/**
+ * Page metadata from API (re-exported from deckTypes)
+ */
+export interface PageMetaDto {
+  number: number; // Current page number (0-based)
+  size: number; // Page size
+  totalElements: number; // Total number of elements
+  totalPages: number; // Total number of pages
+}
+
+/**
+ * AI Generation History row view model
+ */
+export interface AIGenerationHistoryRowVm {
+  id: string; // UUID
+  createdAt: string; // ISO 8601
+  createdAtLabel: string; // Formatted date for UI
+  aiModel: string;
+  sourceTextHash: string;
+  sourceTextHashShort: string; // Shortened hash (e.g., first 12 chars)
+  sourceTextLength: number;
+  generatedCandidatesCount: number;
+  acceptedOrEditedCandidatesCount: number | null; // Null if candidates unavailable
+}
+
+/**
+ * AI Generations History state view model
+ */
+export interface AIGenerationsHistoryStateVm {
+  rows: AIGenerationHistoryRowVm[];
+  isLoading: boolean;
+  error: string | null;
+  page: PageMetaDto | null;
+}

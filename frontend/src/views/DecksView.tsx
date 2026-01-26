@@ -122,6 +122,13 @@ export function DecksView() {
   }, [navigate]);
 
   /**
+   * Navigate to AI generations history view
+   */
+  const handleAiGenerationsHistoryClick = useCallback(() => {
+    navigate("/ai/generations");
+  }, [navigate]);
+
+  /**
    * Open edit dialog
    */
   const handleEditClick = useCallback((deck: DeckListItemVm) => {
@@ -174,6 +181,7 @@ export function DecksView() {
           <DecksHeader
             onCreateClick={handleCreateClick}
             onAiGenerateClick={handleAiGenerateClick}
+            onAiGenerationsHistoryClick={handleAiGenerationsHistoryClick}
             isDisabled={isLoading}
           />
 

@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, History } from "lucide-react";
 import { UserMenu } from "@/components/auth/UserMenu";
 
 interface DecksHeaderProps {
   onCreateClick: () => void;
   onAiGenerateClick: () => void;
+  onAiGenerationsHistoryClick: () => void;
   isDisabled?: boolean;
 }
 
-export function DecksHeader({ onCreateClick, onAiGenerateClick, isDisabled }: DecksHeaderProps) {
+export function DecksHeader({ 
+  onCreateClick, 
+  onAiGenerateClick, 
+  onAiGenerationsHistoryClick,
+  isDisabled 
+}: DecksHeaderProps) {
   return (
     <div className="space-y-4">
       {/* User menu */}
@@ -24,7 +30,15 @@ export function DecksHeader({ onCreateClick, onAiGenerateClick, isDisabled }: De
             Zarządzaj swoimi taliami i ucz się nowych rzeczy
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            onClick={onAiGenerationsHistoryClick} 
+            disabled={isDisabled} 
+            variant="ghost"
+          >
+            <History className="mr-2 h-4 w-4" />
+            Historia generowań AI
+          </Button>
           <Button onClick={onAiGenerateClick} disabled={isDisabled} variant="outline">
             <Sparkles className="mr-2 h-4 w-4" />
             Generuj fiszki (AI)

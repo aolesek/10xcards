@@ -9,6 +9,7 @@ import { StudyView } from "@/views/StudyView";
 import { AIGenerateView } from "@/views/ai/AIGenerateView";
 import { AILoadingView } from "@/views/ai/AILoadingView";
 import { AIReviewView } from "@/views/ai/AIReviewView";
+import { AIGenerationsHistoryView } from "@/views/ai/AIGenerationsHistoryView";
 import { NotFoundView } from "@/views/NotFoundView";
 
 export const router = createBrowserRouter([
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
   {
     path: "/ai/review/:generationId",
     element: <AIReviewView />,
+  },
+  {
+    path: "/ai/generations",
+    element: <AIGenerationsHistoryView />,
   },
   {
     path: "*",
