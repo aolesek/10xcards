@@ -33,6 +33,8 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 ### 3.4. Generowanie fiszek przez AI
 - Dedykowany interfejs do wklejania tekstu (od 500 do 10 000 znaków) w celu wygenerowania fiszek.
 - Przed rozpoczęciem generowania użytkownik musi wybrać istniejącą talię lub utworzyć nową.
+- Użytkownik wybiera model AI z predefiniowanej listy (domyślnie `openai/gpt-4o-mini`; backend waliduje allow-listę).
+- Użytkownik podaje oczekiwaną liczbę fiszek do wygenerowania (domyślnie 10, maksymalnie 100).
 - Synchroniczny proces po stronie backendu, który na podstawie tekstu zwraca listę fiszek-kandydatów.
 - Sesja przeglądu wygenerowanych kandydatów jest utrwalana na backendzie, co pozwala na powrót do niej np. po odświeżeniu strony.
 - Asynchroniczna obsługa na frontendzie, aby nie blokować interfejsu użytkownika podczas generowania.
@@ -41,6 +43,7 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 - Edycja kandydata odbywa się w oknie modalnym.
 - Możliwość wsadowego zapisu wszystkich zaakceptowanych i edytowanych fiszek do wybranej talii za pomocą jednego żądania.
 - Wprowadzenie miesięcznego limitu na liczbę generacji fiszek przez AI dla każdego użytkownika.
+- Dostępny jest widok „Historia generowań AI” (read-only, paginowany) pokazujący wykonane generowania bieżącego użytkownika (m.in. data, model, hash i długość tekstu, liczby wygenerowanych oraz zaakceptowanych/edytowanych).
 
 ### 3.5. Tryb nauki
 - Prosty interfejs do przeglądania fiszek z wybranej talii w losowej kolejności.
@@ -52,11 +55,12 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 ## 4. Granice produktu
 
 ### 4.1. Funkcjonalności w ramach MVP
-- Generowanie fiszek przez AI na podstawie tekstu wklejonego przez użytkownika.
+- Generowanie fiszek przez AI na podstawie tekstu wklejonego przez użytkownika (z wyborem modelu oraz oczekiwanej liczby fiszek).
 - Manualne tworzenie, edycja i usuwanie fiszek.
 - Podstawowy system kont użytkowników (rejestracja, logowanie, odzyskiwanie hasła) do przechowywania fiszek.
 - Organizacja fiszek w talie.
 - Prosty tryb nauki oparty na losowym przeglądaniu fiszek.
+- Historia generowań AI (read-only, informacyjna).
 
 ### 4.2. Funkcjonalności poza zakresem MVP
 - Implementacja zaawansowanego algorytmu powtórek (np. SM-2).
@@ -149,6 +153,8 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
     - W aplikacji dostępna jest dedykowana sekcja do generowania fiszek.
     - Pole tekstowe akceptuje tekst o długości od 500 do 10 000 znaków.
     - Przed rozpoczęciem generowania muszę wybrać istniejącą talię lub utworzyć nową, do której zostaną przypisane fiszki.
+    - Mogę wybrać model AI z listy (domyślnie `openai/gpt-4o-mini`).
+    - Mogę ustawić oczekiwaną liczbę fiszek (domyślnie 10, maksymalnie 100).
     - Po wklejeniu tekstu i kliknięciu "Generuj" rozpoczyna się proces, a UI nie jest blokowane.
     - Po zakończeniu procesu jestem przekierowywany do widoku przeglądu fiszek-kandydatów.
 
@@ -205,6 +211,14 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
     - Każdy użytkownik ma zdefiniowany w systemie miesięczny limit generacji.
     - Próba wykonania generacji po przekroczeniu limitu skutkuje wyświetleniem komunikatu o błędzie.
     - W ramach MVP UI nie informuje proaktywnie o zbliżającym się limicie.
+
+### ID: US-017
+- Tytuł: Historia generowań AI
+- Opis: Jako użytkownik, chcę móc zobaczyć listę moich dotychczasowych generowań AI, aby mieć wgląd w historię użycia i parametry generacji.
+- Kryteria akceptacji:
+    - Dostępny jest widok historii generowań dostępny tylko dla zalogowanego użytkownika.
+    - Widok wyświetla paginowaną listę generowań bieżącego użytkownika (bez akcji na wierszach).
+    - Dla każdego wpisu widoczne są podstawowe informacje: data, model AI, hash i długość tekstu, liczba wygenerowanych oraz zaakceptowanych/edytowanych kandydatów.
 
 ## 6. Metryki sukcesu
 
