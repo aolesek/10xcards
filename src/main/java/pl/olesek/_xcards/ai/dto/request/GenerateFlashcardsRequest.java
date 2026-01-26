@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import pl.olesek._xcards.ai.model.AIModel;
+
 import java.util.UUID;
 
 /**
@@ -30,5 +32,13 @@ public record GenerateFlashcardsRequest(
         @Schema(description = "Number of flashcard candidates to generate (1-100)", 
                 example = "10", 
                 defaultValue = "10")
-        Integer requestedCandidatesCount) {
+        Integer requestedCandidatesCount,
+
+        @Schema(description = "AI model to use for generation. If not provided, defaults to openai/gpt-4o-mini. "
+                + "Allowed values: openai/gpt-4o-mini, openai/gpt-5-mini, google/gemini-2.5-flash, "
+                + "x-ai/grok-4.1-fast, anthropic/claude-sonnet-4.5, deepseek/deepseek-v3.2",
+                example = "openai/gpt-4o-mini",
+                allowableValues = {"openai/gpt-4o-mini", "openai/gpt-5-mini", "google/gemini-2.5-flash",
+                        "x-ai/grok-4.1-fast", "anthropic/claude-sonnet-4.5", "deepseek/deepseek-v3.2"})
+        AIModel model) {
 }

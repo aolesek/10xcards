@@ -54,20 +54,36 @@ public class AIClientService {
     private static final long RETRY_DELAY_MS = 1000;
     
     /**
-     * Generates flashcard candidates from source text using AI. Includes retry logic for handling
-     * transient failures.
+     * Generates flashcard candidates from source text using AI with default model.
+     * Includes retry logic for handling transient failures.
      * 
      * @param sourceText the text to generate flashcards from
      * @param requestedCount the number of flashcard candidates to generate (1-100)
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
+     * @deprecated Use {@link #generateCandidatesFromText(String, int, String)} instead
      */
+    @Deprecated
     public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount) {
-        log.debug("Calling OpenRouter API with model={}, requestedCount={}", model, requestedCount);
+        return generateCandidatesFromText(sourceText, requestedCount, model);
+    }
+
+    /**
+     * Generates flashcard candidates from source text using AI. Includes retry logic for handling
+     * transient failures.
+     * 
+     * @param sourceText the text to generate flashcards from
+     * @param requestedCount the number of flashcard candidates to generate (1-100)
+     * @param modelId the AI model to use for generation
+     * @return list of generated candidates with unique IDs
+     * @throws AIServiceUnavailableException if AI service is unavailable after retries
+     */
+    public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount, String modelId) {
+        log.debug("Calling OpenRouter API with model={}, requestedCount={}", modelId, requestedCount);
 
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
-                return callOpenRouterAPI(sourceText, requestedCount);
+                return callOpenRouterAPI(sourceText, requestedCount, modelId);
             } catch (ResourceAccessException | HttpServerErrorException e) {
                 log.warn("OpenRouter API attempt {} failed: {}", attempt + 1, e.getMessage());
 
@@ -97,16 +113,17 @@ public class AIClientService {
      * 
      * @param sourceText the text to generate flashcards from
      * @param requestedCount the number of flashcard candidates to generate
+     * @param modelId the AI model to use for generation
      * @return list of candidate models
      */
-    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount) {
+    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount, String modelId) {
         String prompt = promptTemplate
                 .replace("{text}", sourceText)
                 .replace("{count}", String.valueOf(requestedCount));
 
         // Build request body according to OpenRouter API specification
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", model);
+        requestBody.put("model", modelId);
 
         List<Map<String, String>> messages = List.of(Map.of("role", "user", "content", prompt));
         requestBody.put("messages", messages);

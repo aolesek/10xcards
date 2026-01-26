@@ -4,20 +4,24 @@ import { Label } from "@/components/ui/label";
 import { LoadingButton } from "@/components/auth/LoadingButton";
 import { InlineError } from "@/components/auth/InlineError";
 import { DeckSelect } from "./DeckSelect";
+import { AIModelSelect } from "./AIModelSelect";
 import { TextareaWithCounter } from "./TextareaWithCounter";
 import type {
   AIGenerateFormVm,
   AIGenerateFormErrorsVm,
   DeckOptionVm,
 } from "@/lib/ai/aiTypes";
+import type { AIModelId, AIModelOptionVm } from "@/lib/ai/aiModels";
 
 interface AIGenerateFormProps {
   form: AIGenerateFormVm;
   errors: AIGenerateFormErrorsVm;
   deckOptions: DeckOptionVm[];
+  modelOptions: AIModelOptionVm[];
   isDecksLoading: boolean;
   isSubmitting: boolean;
   onDeckChange: (deckId: string) => void;
+  onModelChange: (model: AIModelId) => void;
   onSourceTextChange: (value: string) => void;
   onRequestedCandidatesCountChange: (value: number) => void;
   onOpenCreateDeckDialog: () => void;
@@ -28,9 +32,11 @@ export function AIGenerateForm({
   form,
   errors,
   deckOptions,
+  modelOptions,
   isDecksLoading,
   isSubmitting,
   onDeckChange,
+  onModelChange,
   onSourceTextChange,
   onRequestedCandidatesCountChange,
   onOpenCreateDeckDialog,
@@ -72,6 +78,15 @@ export function AIGenerateForm({
           Utwórz nową talię
         </Button>
       </div>
+
+      {/* AI Model selection */}
+      <AIModelSelect
+        value={form.model}
+        options={modelOptions}
+        disabled={isDisabled}
+        error={errors.model}
+        onChange={onModelChange}
+      />
 
       {/* Source text */}
       <TextareaWithCounter

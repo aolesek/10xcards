@@ -1,4 +1,5 @@
 import type { AIGenerateFormVm, AIGenerateFormErrorsVm } from "./aiTypes";
+import { isValidAIModelId } from "./aiModels";
 
 /**
  * Validate AI generate form
@@ -12,6 +13,13 @@ export function validateGenerateForm(form: AIGenerateFormVm): AIGenerateFormErro
   // Validate deckId
   if (!form.deckId || form.deckId.trim().length === 0) {
     errors.deckId = "Wybierz talię";
+  }
+
+  // Validate model
+  if (!form.model || form.model.trim().length === 0) {
+    errors.model = "Wybierz model AI";
+  } else if (!isValidAIModelId(form.model)) {
+    errors.model = "Wybierz poprawny model AI";
   }
 
   // Validate sourceText

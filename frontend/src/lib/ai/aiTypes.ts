@@ -2,6 +2,8 @@
 // DTO Types (API Contracts)
 // ============================================================================
 
+import type { AIModelId } from "./aiModels";
+
 /**
  * Candidate status type
  */
@@ -26,6 +28,7 @@ export interface GenerateFlashcardsRequestDto {
   deckId: string; // UUID
   sourceText: string; // 500-10000 characters after trim
   requestedCandidatesCount: number; // 1-100, default 10
+  model: AIModelId; // AI model to use for generation
 }
 
 /**
@@ -63,6 +66,7 @@ export interface AIGenerateFormVm {
   deckId: string | "";
   sourceText: string;
   requestedCandidatesCount: number;
+  model: AIModelId;
 }
 
 /**
@@ -72,6 +76,7 @@ export interface AIGenerateFormErrorsVm {
   deckId?: string;
   sourceText?: string;
   requestedCandidatesCount?: string;
+  model?: string;
   formError?: string | null;
 }
 
@@ -82,6 +87,7 @@ export interface AIGenerateNavigationState {
   deckId: string;
   sourceText: string; // raw text from textarea; loading view will trim + validate
   requestedCandidatesCount: number;
+  model: AIModelId;
 }
 
 /**

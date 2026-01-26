@@ -21,6 +21,7 @@ import pl.olesek._xcards.ai.exception.InvalidCandidateUpdateException;
 import pl.olesek._xcards.ai.exception.MonthlyAILimitExceededException;
 import pl.olesek._xcards.ai.exception.NoAcceptedCandidatesException;
 import pl.olesek._xcards.ai.mapper.AIGenerationMapper;
+import pl.olesek._xcards.ai.model.AIModel;
 import pl.olesek._xcards.ai.model.CandidateModel;
 import pl.olesek._xcards.auth.exception.RateLimitExceededException;
 import pl.olesek._xcards.deck.DeckEntity;
@@ -110,26 +111,35 @@ public class AIGenerationService {
                 ? request.requestedCandidatesCount() 
                 : 10;
 
-        // 6. Call AI service to generate candidates
-        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(trimmedText, requestedCount);
+        // 6. Determine selected model (use from request or default)
+        AIModel selectedModel = request.model() != null 
+                ? request.model() 
+                : AIModel.DEFAULT;
+        String selectedModelId = selectedModel.getId();
 
-        // 7. Create AIGenerationEntity
+        log.debug("Using AI model: {}", selectedModelId);
+
+        // 7. Call AI service to generate candidates
+        List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(
+                trimmedText, requestedCount, selectedModelId);
+
+        // 8. Create AIGenerationEntity
         AIGenerationEntity entity = new AIGenerationEntity();
         entity.setUser(deck.getUser());
         entity.setDeck(deck);
-        entity.setAiModel(aiModel);
+        entity.setAiModel(selectedModelId);
         entity.setSourceTextHash(sourceTextHash);
         entity.setSourceTextLength(sourceTextLength);
         entity.setGeneratedCandidatesCount(candidates.size());
         entity.setCandidates(mapper.serializeCandidates(candidates));
 
-        // 8. Save to database
+        // 9. Save to database
         AIGenerationEntity saved = aiGenerationRepository.save(entity);
 
-        log.info("Generated {} candidates for user={}, generationId={}", candidates.size(), userId,
-                saved.getId());
+        log.info("Generated {} candidates for user={}, generationId={}, model={}", 
+                candidates.size(), userId, saved.getId(), selectedModelId);
 
-        // 9. Return mapped response
+        // 10. Return mapped response
         return mapper.toResponse(saved);
     }
 

@@ -10,12 +10,14 @@ import { ApiError } from "@/lib/api/httpClient";
 import { CreateDeckDialog } from "@/components/decks/CreateDeckDialog";
 import { AIGenerateForm } from "@/components/ai";
 import { validateGenerateForm } from "@/lib/ai/validateGenerate";
+import { AI_MODEL_OPTIONS, DEFAULT_AI_MODEL } from "@/lib/ai/aiModels";
 import type {
   AIGenerateFormVm,
   AIGenerateFormErrorsVm,
   DeckOptionVm,
   AIGenerateNavigationState,
 } from "@/lib/ai/aiTypes";
+import type { AIModelId } from "@/lib/ai/aiModels";
 import type { DeckResponseDto } from "@/lib/decks/deckTypes";
 
 export function AIGenerateView() {
@@ -33,6 +35,7 @@ export function AIGenerateView() {
     deckId: "",
     sourceText: "",
     requestedCandidatesCount: 10,
+    model: DEFAULT_AI_MODEL,
   });
   const [errors, setErrors] = useState<AIGenerateFormErrorsVm>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,6 +100,14 @@ export function AIGenerateView() {
   const handleDeckChange = useCallback((deckId: string) => {
     setForm((prev) => ({ ...prev, deckId }));
     setErrors((prev) => ({ ...prev, deckId: undefined }));
+  }, []);
+
+  /**
+   * Handle model change
+   */
+  const handleModelChange = useCallback((model: AIModelId) => {
+    setForm((prev) => ({ ...prev, model }));
+    setErrors((prev) => ({ ...prev, model: undefined }));
   }, []);
 
   /**
@@ -166,6 +177,7 @@ export function AIGenerateView() {
       deckId: form.deckId,
       sourceText: form.sourceText,
       requestedCandidatesCount: form.requestedCandidatesCount,
+      model: form.model,
     };
 
     navigate("/ai/loading", { state: navState });
@@ -217,9 +229,11 @@ export function AIGenerateView() {
               form={form}
               errors={errors}
               deckOptions={deckOptions}
+              modelOptions={AI_MODEL_OPTIONS}
               isDecksLoading={isDecksLoading}
               isSubmitting={isSubmitting}
               onDeckChange={handleDeckChange}
+              onModelChange={handleModelChange}
               onSourceTextChange={handleSourceTextChange}
               onRequestedCandidatesCountChange={handleRequestedCandidatesCountChange}
               onOpenCreateDeckDialog={handleOpenCreateDeckDialog}
