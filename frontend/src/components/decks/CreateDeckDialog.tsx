@@ -86,7 +86,7 @@ export function CreateDeckDialog({
     setIsSubmitting(true);
     
     try {
-      const deck = await createDeck(accessToken, {
+      const deck = await createDeck({
         name: name.trim(),
       });
       

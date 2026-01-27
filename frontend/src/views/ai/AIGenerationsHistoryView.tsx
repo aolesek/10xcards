@@ -102,7 +102,6 @@ function useAIGenerationsHistory(accessToken: string | null, page: number, size:
 
     try {
       const response = await listAIGenerations(
-        accessToken,
         {
           page,
           size,

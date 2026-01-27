@@ -47,7 +47,7 @@ export function ConfirmDeleteDialog({
     setIsDeleting(true);
     
     try {
-      await deleteDeck(accessToken, deck.id);
+      await deleteDeck(deck.id);
       onDeleted(deck.id);
       onOpenChange(false);
     } catch (err) {

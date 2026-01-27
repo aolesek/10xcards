@@ -119,7 +119,7 @@ export function CreateFlashcardDialog({
     setIsSubmitting(true);
     
     try {
-      const flashcard = await createFlashcard(accessToken, deckId, {
+      const flashcard = await createFlashcard(deckId, {
         front: front.trim(),
         back: back.trim(),
       });

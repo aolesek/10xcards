@@ -41,6 +41,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   /**
+   * Logout user
+   */
+  const logout = useCallback(() => {
+    setUser(null);
+    setAccessToken(null);
+    setRefreshToken(null);
+    tokenStorage.clearTokens();
+  }, []);
+
+  /**
    * Restore session from localStorage on mount
    */
   useEffect(() => {
@@ -79,6 +89,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     restoreSession();
   }, []);
+
+  /**
+   * Listen for token refresh failures from authenticatedClient
+   */
+  useEffect(() => {
+    const handleTokenRefreshFailed = () => {
+      console.warn("Token refresh failed, logging out user");
+      logout();
+    };
+
+    window.addEventListener("auth:token-refresh-failed", handleTokenRefreshFailed);
+
+    return () => {
+      window.removeEventListener("auth:token-refresh-failed", handleTokenRefreshFailed);
+    };
+  }, [logout]);
 
   /**
    * Set auth state from AuthResponseDto
@@ -121,16 +147,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
     [setAuthState]
   );
-
-  /**
-   * Logout user
-   */
-  const logout = useCallback(() => {
-    setUser(null);
-    setAccessToken(null);
-    setRefreshToken(null);
-    tokenStorage.clearTokens();
-  }, []);
 
   const isAuthenticated = useMemo(() => {
     return !!(user && accessToken && refreshToken);

@@ -63,7 +63,7 @@ export function AIGenerateView() {
     setDecksError(null);
 
     try {
-      const response = await listDecks(accessToken, {
+      const response = await listDecks({
         size: 100,
         sort: "createdAt,desc",
       });

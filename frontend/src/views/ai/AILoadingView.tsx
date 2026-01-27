@@ -64,7 +64,7 @@ export function AILoadingView() {
     setMode("loading");
 
     try {
-      const response = await generateFlashcards(accessToken, {
+      const response = await generateFlashcards({
         deckId: state.deckId,
         sourceText: state.sourceText.trim(),
         requestedCandidatesCount: state.requestedCandidatesCount,

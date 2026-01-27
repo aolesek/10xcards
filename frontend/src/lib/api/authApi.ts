@@ -63,6 +63,24 @@ export async function confirmPasswordReset(
 }
 
 /**
+ * Refresh access token using refresh token
+ * @param refreshToken - JWT refresh token
+ * @throws ApiError with status 401 (invalid/expired refresh token)
+ */
+export async function refreshAccessToken(refreshToken: string): Promise<{
+  accessToken: string;
+  refreshToken: string;
+}> {
+  return fetchJson<{ accessToken: string; refreshToken: string }>(
+    `${API_BASE}/refresh`,
+    {
+      method: "POST",
+      body: JSON.stringify({ refreshToken }),
+    }
+  );
+}
+
+/**
  * Get current user information
  * @param accessToken - JWT access token
  * @throws ApiError with status 401 (unauthorized/invalid token)

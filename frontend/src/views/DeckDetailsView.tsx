@@ -52,7 +52,7 @@ export function DeckDetailsView() {
     setError(null);
 
     try {
-      const deckData = await getDeck(accessToken, deckId);
+      const deckData = await getDeck(deckId);
       setDeck(deckData);
     } catch (err) {
       // Handle 401 - session expired
@@ -87,7 +87,7 @@ export function DeckDetailsView() {
     setError(null);
 
     try {
-      const response = await listFlashcardsInDeck(accessToken, deckId, {
+      const response = await listFlashcardsInDeck(deckId, {
         size: 100,
         sort: "createdAt,desc",
       });

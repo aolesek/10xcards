@@ -47,7 +47,7 @@ export function ConfirmDeleteFlashcardDialog({
     setIsDeleting(true);
     
     try {
-      await deleteFlashcard(accessToken, flashcard.id);
+      await deleteFlashcard(flashcard.id);
       onDeleted(flashcard.id);
       onOpenChange(false);
     } catch (err) {

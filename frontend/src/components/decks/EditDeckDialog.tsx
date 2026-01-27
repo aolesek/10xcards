@@ -100,7 +100,7 @@ export function EditDeckDialog({
     setIsSubmitting(true);
     
     try {
-      const updatedDeck = await updateDeck(accessToken, deck.id, {
+      const updatedDeck = await updateDeck(deck.id, {
         name: name.trim(),
       });
       

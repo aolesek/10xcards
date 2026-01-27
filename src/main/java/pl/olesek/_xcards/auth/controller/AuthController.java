@@ -104,6 +104,11 @@ public class AuthController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "User info retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")})
     public ResponseEntity<UserInfoResponse> getCurrentUser(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            log.warn("Attempted to get current user without valid authentication");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
         UUID userId = (UUID) authentication.getPrincipal();
         log.debug("Get current user request for: {}", userId);
         UserInfoResponse response = authService.getCurrentUser(userId);

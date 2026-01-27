@@ -1,4 +1,4 @@
-import { fetchJson } from "./httpClient";
+import { authenticatedFetch } from "./authenticatedClient";
 import type {
   PagedFlashcardResponseDto,
   FlashcardResponseDto,
@@ -21,13 +21,12 @@ export interface ListFlashcardsParams {
 
 /**
  * List flashcards in a specific deck (paginated)
- * @param accessToken - JWT access token
+ * Automatically handles token refresh if expired
  * @param deckId - UUID of the deck
  * @param params - Optional pagination, sorting, and filtering parameters
  * @throws ApiError with status 401 (unauthorized), 404 (deck not found), 500 (server error)
  */
 export async function listFlashcardsInDeck(
-  accessToken: string,
   deckId: string,
   params?: ListFlashcardsParams
 ): Promise<PagedFlashcardResponseDto> {
@@ -53,88 +52,69 @@ export async function listFlashcardsInDeck(
     ? `${API_BASE_DECKS}/${deckId}/flashcards?${queryParams.toString()}`
     : `${API_BASE_DECKS}/${deckId}/flashcards`;
   
-  return fetchJson<PagedFlashcardResponseDto>(url, {
+  return authenticatedFetch<PagedFlashcardResponseDto>(url, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
   });
 }
 
 /**
  * Get a single flashcard by ID
- * @param accessToken - JWT access token
+ * Automatically handles token refresh if expired
  * @param flashcardId - UUID of the flashcard to retrieve
  * @throws ApiError with status 401 (unauthorized), 404 (not found)
  */
 export async function getFlashcard(
-  accessToken: string,
   flashcardId: string
 ): Promise<FlashcardResponseDto> {
-  return fetchJson<FlashcardResponseDto>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
+  return authenticatedFetch<FlashcardResponseDto>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
   });
 }
 
 /**
  * Create a new flashcard in a deck
- * @param accessToken - JWT access token
+ * Automatically handles token refresh if expired
  * @param deckId - UUID of the deck to add the flashcard to
  * @param dto - Flashcard creation data
  * @throws ApiError with status 400 (validation), 401 (unauthorized), 404 (deck not found)
  */
 export async function createFlashcard(
-  accessToken: string,
   deckId: string,
   dto: CreateFlashcardRequestDto
 ): Promise<FlashcardResponseDto> {
-  return fetchJson<FlashcardResponseDto>(`${API_BASE_DECKS}/${deckId}/flashcards`, {
+  return authenticatedFetch<FlashcardResponseDto>(`${API_BASE_DECKS}/${deckId}/flashcards`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(dto),
   });
 }
 
 /**
  * Update an existing flashcard
- * @param accessToken - JWT access token
+ * Automatically handles token refresh if expired
  * @param flashcardId - UUID of the flashcard to update
  * @param dto - Flashcard update data
  * @throws ApiError with status 400 (validation), 401 (unauthorized), 404 (not found)
  */
 export async function updateFlashcard(
-  accessToken: string,
   flashcardId: string,
   dto: UpdateFlashcardRequestDto
 ): Promise<FlashcardResponseDto> {
-  return fetchJson<FlashcardResponseDto>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
+  return authenticatedFetch<FlashcardResponseDto>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: JSON.stringify(dto),
   });
 }
 
 /**
  * Delete a flashcard
- * @param accessToken - JWT access token
+ * Automatically handles token refresh if expired
  * @param flashcardId - UUID of the flashcard to delete
  * @throws ApiError with status 401 (unauthorized), 404 (not found)
  */
 export async function deleteFlashcard(
-  accessToken: string,
   flashcardId: string
 ): Promise<void> {
-  await fetchJson<void>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
+  await authenticatedFetch<void>(`${API_BASE_FLASHCARDS}/${flashcardId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
   });
 }

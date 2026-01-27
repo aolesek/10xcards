@@ -96,7 +96,7 @@ export function AIReviewView() {
     setError(null);
 
     try {
-      const response = await getAIGeneration(accessToken, generationId);
+      const response = await getAIGeneration(generationId);
       const vm = mapToReviewVm(response);
       setGeneration(vm);
       setMode("ready");
@@ -152,7 +152,7 @@ export function AIReviewView() {
       setUpdatingCandidateIds((prev) => new Set(prev).add(candidateId));
 
       try {
-        await updateAICandidates(accessToken, generationId, {
+        await updateAICandidates(generationId, {
           candidates: [
             {
               id: candidateId,
@@ -212,7 +212,7 @@ export function AIReviewView() {
       setUpdatingCandidateIds((prev) => new Set(prev).add(candidateId));
 
       try {
-        await updateAICandidates(accessToken, generationId, {
+        await updateAICandidates(generationId, {
           candidates: [
             {
               id: candidateId,
@@ -273,7 +273,7 @@ export function AIReviewView() {
       setIsEditSubmitting(true);
 
       try {
-        await updateAICandidates(accessToken, generationId, {
+        await updateAICandidates(generationId, {
           candidates: [
             {
               id: candidateId,
@@ -362,7 +362,7 @@ export function AIReviewView() {
     setError(null);
 
     try {
-      await saveAICandidates(accessToken, generationId);
+      await saveAICandidates(generationId);
 
       // Navigate to deck details on success
       navigate(`/decks/${generation.deckId}`, { replace: true });

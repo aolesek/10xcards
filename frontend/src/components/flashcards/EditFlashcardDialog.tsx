@@ -133,7 +133,7 @@ export function EditFlashcardDialog({
     setIsSubmitting(true);
     
     try {
-      const updatedFlashcard = await updateFlashcard(accessToken, flashcard.id, {
+      const updatedFlashcard = await updateFlashcard(flashcard.id, {
         front: front.trim(),
         back: back.trim(),
       });

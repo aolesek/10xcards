@@ -69,7 +69,7 @@ export function StudyView() {
     setMode("loading");
 
     try {
-      const data = await getStudySession(accessToken, deckId, { shuffle: true });
+      const data = await getStudySession(deckId, { shuffle: true });
       setSession(data);
 
       if (data.totalCards === 0) {
