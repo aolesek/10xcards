@@ -18,7 +18,6 @@ import type { DeckListItemVm, DeckResponseDto } from "@/lib/decks/deckTypes";
 interface EditDeckDialogProps {
   open: boolean;
   deck: DeckListItemVm | null;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onUpdated: (deck: DeckResponseDto) => void;
 }
@@ -26,7 +25,6 @@ interface EditDeckDialogProps {
 export function EditDeckDialog({
   open,
   deck,
-  accessToken,
   onOpenChange,
   onUpdated,
 }: EditDeckDialogProps) {

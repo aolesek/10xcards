@@ -49,7 +49,7 @@ export function parseValidationErrors(message: string): FieldErrors | null {
     
     // Return null if no fields were parsed
     return Object.keys(fieldErrors).length > 0 ? fieldErrors : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

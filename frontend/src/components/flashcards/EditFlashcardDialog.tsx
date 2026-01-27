@@ -18,7 +18,6 @@ import type { FlashcardResponseDto, FlashcardListItemVm } from "@/lib/flashcards
 interface EditFlashcardDialogProps {
   open: boolean;
   flashcard: FlashcardListItemVm | null;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onUpdated: (flashcard: FlashcardResponseDto) => void;
 }
@@ -26,7 +25,6 @@ interface EditFlashcardDialogProps {
 export function EditFlashcardDialog({
   open,
   flashcard,
-  accessToken,
   onOpenChange,
   onUpdated,
 }: EditFlashcardDialogProps) {

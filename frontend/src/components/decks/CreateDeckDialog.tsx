@@ -17,14 +17,12 @@ import type { DeckResponseDto } from "@/lib/decks/deckTypes";
 
 interface CreateDeckDialogProps {
   open: boolean;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onCreated: (deck: DeckResponseDto) => void;
 }
 
 export function CreateDeckDialog({
   open,
-  accessToken,
   onOpenChange,
   onCreated,
 }: CreateDeckDialogProps) {

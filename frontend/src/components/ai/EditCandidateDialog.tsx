@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useId, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,28 +43,48 @@ export function EditCandidateDialog({
   const frontErrorId = useId();
   const backErrorId = useId();
 
-  // Prefill form when candidate changes or dialog opens
-  useEffect(() => {
-    if (open && candidate) {
-      // If candidate was already edited, use edited values; otherwise use original
-      setEditedFront(candidate.editedFront || candidate.front);
-      setEditedBack(candidate.editedBack || candidate.back);
-      setFrontError(null);
-      setBackError(null);
-      setFormError(null);
-    }
-  }, [open, candidate]);
+  // Track previous open state to detect dialog state changes
+  const prevOpenRef = useRef(open);
+  const prevCandidateRef = useRef(candidate);
 
-  // Reset form when dialog closes
+  // Update form when dialog opens with a candidate
   useEffect(() => {
-    if (!open) {
-      setEditedFront("");
-      setEditedBack("");
-      setFrontError(null);
-      setBackError(null);
-      setFormError(null);
+    const wasOpened = !prevOpenRef.current && open;
+    const wasClosed = prevOpenRef.current && !open;
+    const candidateChanged = prevCandidateRef.current !== candidate;
+
+    if (wasOpened && candidate) {
+      // Dialog just opened - prefill form using queueMicrotask to avoid cascading renders
+      queueMicrotask(() => {
+        setEditedFront(candidate.editedFront || candidate.front);
+        setEditedBack(candidate.editedBack || candidate.back);
+        setFrontError(null);
+        setBackError(null);
+        setFormError(null);
+      });
+    } else if (wasClosed) {
+      // Dialog just closed - reset form
+      queueMicrotask(() => {
+        setEditedFront("");
+        setEditedBack("");
+        setFrontError(null);
+        setBackError(null);
+        setFormError(null);
+      });
+    } else if (open && candidateChanged && candidate) {
+      // Candidate changed while dialog is open
+      queueMicrotask(() => {
+        setEditedFront(candidate.editedFront || candidate.front);
+        setEditedBack(candidate.editedBack || candidate.back);
+        setFrontError(null);
+        setBackError(null);
+        setFormError(null);
+      });
     }
-  }, [open]);
+
+    prevOpenRef.current = open;
+    prevCandidateRef.current = candidate;
+  }, [open, candidate]);
 
   // Clear field error when user types
   const handleFrontChange = (value: string) => {

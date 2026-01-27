@@ -17,7 +17,6 @@ import type { FlashcardListItemVm } from "@/lib/flashcards/flashcardTypes";
 interface ConfirmDeleteFlashcardDialogProps {
   open: boolean;
   flashcard: FlashcardListItemVm | null;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onDeleted: (flashcardId: string) => void;
 }
@@ -25,7 +24,6 @@ interface ConfirmDeleteFlashcardDialogProps {
 export function ConfirmDeleteFlashcardDialog({
   open,
   flashcard,
-  accessToken,
   onOpenChange,
   onDeleted,
 }: ConfirmDeleteFlashcardDialogProps) {

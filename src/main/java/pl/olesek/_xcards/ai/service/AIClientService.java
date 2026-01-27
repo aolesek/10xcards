@@ -65,7 +65,8 @@ public class AIClientService {
      * @param requestedCount the number of flashcard candidates to generate (1-100)
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
-     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)} instead
+     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)}
+     *             instead
      */
     @Deprecated
     public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount) {
@@ -81,7 +82,8 @@ public class AIClientService {
      * @param modelId the AI model to use for generation
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
-     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)} instead
+     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)}
+     *             instead
      */
     @Deprecated
     public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount, String modelId) {
@@ -99,9 +101,9 @@ public class AIClientService {
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
      */
-    public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount, 
+    public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount,
             String modelId, AIGenerationMode mode) {
-        log.debug("Calling OpenRouter API with model={}, requestedCount={}, mode={}", 
+        log.debug("Calling OpenRouter API with model={}, requestedCount={}, mode={}",
                 modelId, requestedCount, mode);
 
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -140,19 +142,19 @@ public class AIClientService {
      * @param mode the generation mode
      * @return list of candidate models
      */
-    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount, 
+    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount,
             String modelId, AIGenerationMode mode) {
-        
+
         // Select prompt template based on mode
-        String promptTemplate = mode.isLanguageMode() 
-                ? promptTemplateLanguage 
+        String promptTemplate = mode.isLanguageMode()
+                ? promptTemplateLanguage
                 : promptTemplateKnowledge;
-        
+
         // Build prompt with placeholders
         String prompt = promptTemplate
                 .replace("{text}", sourceText)
                 .replace("{count}", String.valueOf(requestedCount));
-        
+
         // For language modes, add CEFR level
         if (mode.isLanguageMode()) {
             String cefrLevel = mode.getCefrLevel();

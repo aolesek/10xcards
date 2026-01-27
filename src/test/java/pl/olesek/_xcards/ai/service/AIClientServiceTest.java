@@ -37,24 +37,27 @@ class AIClientServiceTest {
     @Mock
     private RestTemplate aiRestTemplate;
 
-    @Mock
-    private ObjectMapper objectMapper;
-
     @InjectMocks
     private AIClientService aiClientService;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private String mockApiKey = "test-api-key";
     private String mockBaseUrl = "https://openrouter.ai/api/v1";
     private String mockModel = "openai/gpt-4";
-    private String mockPromptTemplate =
+    private String mockPromptTemplateKnowledge =
             "Generate {count} flashcard question-answer pairs from the following text. Return JSON array with format: [{\"front\": \"question\", \"back\": \"answer\"}]. Text: {text}";
+    private String mockPromptTemplateLanguage =
+            "Generate {count} flashcard question-answer pairs for language learning. Return JSON array with format: [{\"front\": \"question\", \"back\": \"answer\"}]. Text: {text}";
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(aiClientService, "objectMapper", objectMapper);
         ReflectionTestUtils.setField(aiClientService, "apiKey", mockApiKey);
         ReflectionTestUtils.setField(aiClientService, "baseUrl", mockBaseUrl);
         ReflectionTestUtils.setField(aiClientService, "model", mockModel);
-        ReflectionTestUtils.setField(aiClientService, "promptTemplate", mockPromptTemplate);
+        ReflectionTestUtils.setField(aiClientService, "promptTemplateKnowledge", mockPromptTemplateKnowledge);
+        ReflectionTestUtils.setField(aiClientService, "promptTemplateLanguage", mockPromptTemplateLanguage);
     }
 
     @Test
@@ -109,8 +112,8 @@ class AIClientServiceTest {
 
         when(aiRestTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                 eq(String.class)))
-                .thenThrow(HttpServerErrorException.ServiceUnavailable.create(null, null,
-                        null, null, null));
+                .thenThrow(new HttpServerErrorException(
+                        org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable"));
 
         // When/Then
         assertThatThrownBy(() -> aiClientService.generateCandidatesFromText(sourceText, 10))

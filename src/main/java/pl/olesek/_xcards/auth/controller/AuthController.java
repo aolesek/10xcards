@@ -108,7 +108,7 @@ public class AuthController {
             log.warn("Attempted to get current user without valid authentication");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         UUID userId = (UUID) authentication.getPrincipal();
         log.debug("Get current user request for: {}", userId);
         UserInfoResponse response = authService.getCurrentUser(userId);

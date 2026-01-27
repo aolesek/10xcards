@@ -23,6 +23,8 @@ import pl.olesek._xcards.ai.exception.InvalidCandidateUpdateException;
 import pl.olesek._xcards.ai.exception.MonthlyAILimitExceededException;
 import pl.olesek._xcards.ai.exception.NoAcceptedCandidatesException;
 import pl.olesek._xcards.ai.mapper.AIGenerationMapper;
+import pl.olesek._xcards.ai.model.AIGenerationMode;
+import pl.olesek._xcards.ai.model.AIModel;
 import pl.olesek._xcards.ai.model.CandidateModel;
 import pl.olesek._xcards.auth.exception.RateLimitExceededException;
 import pl.olesek._xcards.deck.DeckEntity;
@@ -139,7 +141,8 @@ class AIGenerationServiceTest {
     void shouldGenerateFlashcardsSuccessfully() {
         // Given
         String sourceText = "Photosynthesis is the process...";
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, sourceText, 10);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, sourceText, 10, AIModel.GPT_4O_MINI,
+                AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
         when(deckRepository.findByIdAndUserId(deckId, userId))
                 .thenReturn(Optional.of(testDeck));
@@ -147,7 +150,8 @@ class AIGenerationServiceTest {
                 .thenReturn(true);
         when(aiGenerationRepository.findByUserIdOrderByCreatedAtDesc(userId))
                 .thenReturn(List.of());
-        when(aiClientService.generateCandidatesFromText(anyString(), anyInt())).thenReturn(testCandidates);
+        when(aiClientService.generateCandidatesFromText(anyString(), anyInt(), anyString(), any()))
+                .thenReturn(testCandidates);
         when(mapper.serializeCandidates(any())).thenReturn(candidatesJson);
         when(aiGenerationRepository.save(any(AIGenerationEntity.class)))
                 .thenReturn(testGeneration);
@@ -166,7 +170,8 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenDeckNotFound() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10, AIModel.GPT_4O_MINI,
+                AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
         when(deckRepository.findByIdAndUserId(deckId, userId)).thenReturn(Optional.empty());
         when(deckRepository.existsById(deckId)).thenReturn(false);
@@ -180,7 +185,8 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowForbiddenWhenDeckBelongsToAnotherUser() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10, AIModel.GPT_4O_MINI,
+                AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
         when(deckRepository.findByIdAndUserId(deckId, userId)).thenReturn(Optional.empty());
         when(deckRepository.existsById(deckId)).thenReturn(true);
@@ -194,7 +200,8 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenRateLimitExceeded() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10, AIModel.GPT_4O_MINI,
+                AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
         when(deckRepository.findByIdAndUserId(deckId, userId))
                 .thenReturn(Optional.of(testDeck));
@@ -210,13 +217,15 @@ class AIGenerationServiceTest {
     @Test
     void shouldThrowExceptionWhenMonthlyLimitExceeded() {
         // Given
-        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10);
+        GenerateFlashcardsRequest request = new GenerateFlashcardsRequest(deckId, "Test text", 10, AIModel.GPT_4O_MINI,
+                AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
-        // Create 100 generations from this month
+        // Create 100 generations from this month (all within current month)
         List<AIGenerationEntity> generations =
                 java.util.stream.IntStream.range(0, 100).mapToObj(i -> {
                     AIGenerationEntity gen = new AIGenerationEntity();
-                    gen.setCreatedAt(Instant.now().minus(i, ChronoUnit.DAYS));
+                    // Set all generations to be within this month (subtract hours instead of days)
+                    gen.setCreatedAt(Instant.now().minus(i, ChronoUnit.HOURS));
                     return gen;
                 }).toList();
 

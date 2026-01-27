@@ -260,14 +260,11 @@ export function AIGenerateView() {
         </div>
 
         {/* Create deck dialog */}
-        {accessToken && (
-          <CreateDeckDialog
-            open={isCreateDeckOpen}
-            accessToken={accessToken}
-            onOpenChange={setIsCreateDeckOpen}
-            onCreated={handleDeckCreated}
-          />
-        )}
+        <CreateDeckDialog
+          open={isCreateDeckOpen}
+          onOpenChange={setIsCreateDeckOpen}
+          onCreated={handleDeckCreated}
+        />
       </div>
     </ProtectedRoute>
   );

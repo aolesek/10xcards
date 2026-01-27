@@ -15,7 +15,6 @@ import { EditFlashcardDialog } from "@/components/flashcards/EditFlashcardDialog
 import { ConfirmDeleteFlashcardDialog } from "@/components/flashcards/ConfirmDeleteFlashcardDialog";
 import type {
   FlashcardListItemVm,
-  FlashcardResponseDto,
 } from "@/lib/flashcards/flashcardTypes";
 import type { DeckResponseDto, PageMetaDto } from "@/lib/decks/deckTypes";
 
@@ -137,7 +136,7 @@ export function DeckDetailsView() {
    * Handle flashcard creation
    */
   const handleCreated = useCallback(
-    (_flashcard: FlashcardResponseDto) => {
+    () => {
       // Refetch both deck (for updated count) and flashcards list
       fetchAll();
     },
@@ -148,7 +147,7 @@ export function DeckDetailsView() {
    * Handle flashcard update
    */
   const handleUpdated = useCallback(
-    (_flashcard: FlashcardResponseDto) => {
+    () => {
       // Refetch flashcards list to reflect source changes (ai -> ai-edited)
       fetchFlashcards();
     },
@@ -159,7 +158,7 @@ export function DeckDetailsView() {
    * Handle flashcard deletion
    */
   const handleDeleted = useCallback(
-    (_flashcardId: string) => {
+    () => {
       // Refetch both deck (for updated count) and flashcards list
       fetchAll();
     },
@@ -289,7 +288,6 @@ export function DeckDetailsView() {
             <CreateFlashcardDialog
               open={createOpen}
               deckId={deckId}
-              accessToken={accessToken}
               onOpenChange={setCreateOpen}
               onCreated={handleCreated}
             />
@@ -297,7 +295,6 @@ export function DeckDetailsView() {
             <EditFlashcardDialog
               open={editOpen}
               flashcard={selectedFlashcard}
-              accessToken={accessToken}
               onOpenChange={setEditOpen}
               onUpdated={handleUpdated}
             />
@@ -305,7 +302,6 @@ export function DeckDetailsView() {
             <ConfirmDeleteFlashcardDialog
               open={deleteOpen}
               flashcard={selectedFlashcard}
-              accessToken={accessToken}
               onOpenChange={setDeleteOpen}
               onDeleted={handleDeleted}
             />

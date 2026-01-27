@@ -14,7 +14,6 @@ import { EditDeckDialog } from "@/components/decks/EditDeckDialog";
 import { ConfirmDeleteDialog } from "@/components/decks/ConfirmDeleteDialog";
 import type {
   DeckListItemVm,
-  DeckResponseDto,
   PageMetaDto,
 } from "@/lib/decks/deckTypes";
 
@@ -78,7 +77,7 @@ export function DecksView() {
    * Handle deck creation
    */
   const handleCreated = useCallback(
-    (_deck: DeckResponseDto) => {
+    () => {
       // Refetch list to ensure consistency
       fetchDecks();
     },
@@ -89,7 +88,7 @@ export function DecksView() {
    * Handle deck update
    */
   const handleUpdated = useCallback(
-    (_deck: DeckResponseDto) => {
+    () => {
       // Refetch list to ensure consistency
       fetchDecks();
     },
@@ -100,7 +99,7 @@ export function DecksView() {
    * Handle deck deletion
    */
   const handleDeleted = useCallback(
-    (_deckId: string) => {
+    () => {
       // Refetch list to ensure consistency
       fetchDecks();
     },
@@ -236,7 +235,6 @@ export function DecksView() {
           <>
             <CreateDeckDialog
               open={createOpen}
-              accessToken={accessToken}
               onOpenChange={setCreateOpen}
               onCreated={handleCreated}
             />
@@ -244,7 +242,6 @@ export function DecksView() {
             <EditDeckDialog
               open={editOpen}
               deck={selectedDeck}
-              accessToken={accessToken}
               onOpenChange={setEditOpen}
               onUpdated={handleUpdated}
             />
@@ -252,7 +249,6 @@ export function DecksView() {
             <ConfirmDeleteDialog
               open={deleteOpen}
               deck={selectedDeck}
-              accessToken={accessToken}
               onOpenChange={setDeleteOpen}
               onDeleted={handleDeleted}
             />

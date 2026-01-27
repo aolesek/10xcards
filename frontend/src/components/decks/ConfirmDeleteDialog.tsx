@@ -17,7 +17,6 @@ import type { DeckListItemVm } from "@/lib/decks/deckTypes";
 interface ConfirmDeleteDialogProps {
   open: boolean;
   deck: DeckListItemVm | null;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onDeleted: (deckId: string) => void;
 }
@@ -25,7 +24,6 @@ interface ConfirmDeleteDialogProps {
 export function ConfirmDeleteDialog({
   open,
   deck,
-  accessToken,
   onOpenChange,
   onDeleted,
 }: ConfirmDeleteDialogProps) {

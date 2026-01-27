@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Enum representing AI generation modes for flashcard generation.
- * Defines different strategies for generating flashcards from source text.
+ * Enum representing AI generation modes for flashcard generation. Defines different strategies for
+ * generating flashcards from source text.
  */
 @Getter
 @RequiredArgsConstructor
@@ -78,6 +78,7 @@ public enum AIGenerationMode {
 
     /**
      * Returns the CEFR level suffix for language modes, or null for knowledge assimilation.
+     * 
      * @return CEFR level string (e.g., "A1", "B2") or null
      */
     public String getCefrLevel() {
@@ -90,6 +91,7 @@ public enum AIGenerationMode {
 
     /**
      * Checks if this is a language learning mode.
+     * 
      * @return true if language mode, false if knowledge assimilation
      */
     public boolean isLanguageMode() {

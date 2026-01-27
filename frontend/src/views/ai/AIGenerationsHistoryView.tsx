@@ -176,7 +176,7 @@ export function AIGenerationsHistoryView() {
     retry();
   }, [retry]);
 
-  const handleRowClick = useCallback((generationId: number) => {
+  const handleRowClick = useCallback((generationId: string) => {
     navigate(`/ai/review/${generationId}`);
   }, [navigate]);
 

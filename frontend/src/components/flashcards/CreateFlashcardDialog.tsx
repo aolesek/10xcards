@@ -18,7 +18,6 @@ import type { FlashcardResponseDto } from "@/lib/flashcards/flashcardTypes";
 interface CreateFlashcardDialogProps {
   open: boolean;
   deckId: string;
-  accessToken: string;
   onOpenChange: (open: boolean) => void;
   onCreated: (flashcard: FlashcardResponseDto) => void;
 }
@@ -26,7 +25,6 @@ interface CreateFlashcardDialogProps {
 export function CreateFlashcardDialog({
   open,
   deckId,
-  accessToken,
   onOpenChange,
   onCreated,
 }: CreateFlashcardDialogProps) {

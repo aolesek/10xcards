@@ -10,7 +10,7 @@ import type { AIGenerationHistoryRowVm } from "@/lib/ai/aiTypes";
 
 interface AIGenerationsHistoryTableProps {
   rows: AIGenerationHistoryRowVm[];
-  onRowClick?: (generationId: number) => void;
+  onRowClick?: (generationId: string) => void;
 }
 
 export function AIGenerationsHistoryTable({ rows, onRowClick }: AIGenerationsHistoryTableProps) {
