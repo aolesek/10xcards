@@ -11,11 +11,16 @@ import { CreateDeckDialog } from "@/components/decks/CreateDeckDialog";
 import { AIGenerateForm } from "@/components/ai";
 import { validateGenerateForm } from "@/lib/ai/validateGenerate";
 import { AI_MODEL_OPTIONS, DEFAULT_AI_MODEL } from "@/lib/ai/aiModels";
+import {
+  AI_GENERATION_MODE_OPTIONS,
+  DEFAULT_AI_GENERATION_MODE,
+} from "@/lib/ai/aiGenerationModes";
 import type {
   AIGenerateFormVm,
   AIGenerateFormErrorsVm,
   DeckOptionVm,
   AIGenerateNavigationState,
+  AIGenerationMode,
 } from "@/lib/ai/aiTypes";
 import type { AIModelId } from "@/lib/ai/aiModels";
 import type { DeckResponseDto } from "@/lib/decks/deckTypes";
@@ -36,6 +41,7 @@ export function AIGenerateView() {
     sourceText: "",
     requestedCandidatesCount: 10,
     model: DEFAULT_AI_MODEL,
+    mode: DEFAULT_AI_GENERATION_MODE,
   });
   const [errors, setErrors] = useState<AIGenerateFormErrorsVm>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,6 +117,14 @@ export function AIGenerateView() {
   }, []);
 
   /**
+   * Handle mode change
+   */
+  const handleModeChange = useCallback((mode: AIGenerationMode) => {
+    setForm((prev) => ({ ...prev, mode }));
+    setErrors((prev) => ({ ...prev, mode: undefined }));
+  }, []);
+
+  /**
    * Handle source text change
    */
   const handleSourceTextChange = useCallback((value: string) => {
@@ -178,6 +192,7 @@ export function AIGenerateView() {
       sourceText: form.sourceText,
       requestedCandidatesCount: form.requestedCandidatesCount,
       model: form.model,
+      mode: form.mode,
     };
 
     navigate("/ai/loading", { state: navState });
@@ -230,10 +245,12 @@ export function AIGenerateView() {
               errors={errors}
               deckOptions={deckOptions}
               modelOptions={AI_MODEL_OPTIONS}
+              modeOptions={AI_GENERATION_MODE_OPTIONS}
               isDecksLoading={isDecksLoading}
               isSubmitting={isSubmitting}
               onDeckChange={handleDeckChange}
               onModelChange={handleModelChange}
+              onModeChange={handleModeChange}
               onSourceTextChange={handleSourceTextChange}
               onRequestedCandidatesCountChange={handleRequestedCandidatesCountChange}
               onOpenCreateDeckDialog={handleOpenCreateDeckDialog}

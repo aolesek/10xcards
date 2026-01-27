@@ -1,6 +1,8 @@
 export { AIGenerateForm } from "./AIGenerateForm";
 export { DeckSelect } from "./DeckSelect";
 export { AIModelSelect } from "./AIModelSelect";
+export { AIGenerationModeSelect } from "./AIGenerationModeSelect";
+export { ModeInfoTooltip } from "./ModeInfoTooltip";
 export { TextareaWithCounter } from "./TextareaWithCounter";
 export { AITriviaLoading } from "./AITriviaLoading";
 export { AIGenerationHeader } from "./AIGenerationHeader";

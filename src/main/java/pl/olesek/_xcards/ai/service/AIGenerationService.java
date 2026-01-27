@@ -21,6 +21,7 @@ import pl.olesek._xcards.ai.exception.InvalidCandidateUpdateException;
 import pl.olesek._xcards.ai.exception.MonthlyAILimitExceededException;
 import pl.olesek._xcards.ai.exception.NoAcceptedCandidatesException;
 import pl.olesek._xcards.ai.mapper.AIGenerationMapper;
+import pl.olesek._xcards.ai.model.AIGenerationMode;
 import pl.olesek._xcards.ai.model.AIModel;
 import pl.olesek._xcards.ai.model.CandidateModel;
 import pl.olesek._xcards.auth.exception.RateLimitExceededException;
@@ -117,11 +118,16 @@ public class AIGenerationService {
                 : AIModel.DEFAULT;
         String selectedModelId = selectedModel.getId();
 
-        log.debug("Using AI model: {}", selectedModelId);
+        // 6a. Determine generation mode (use from request or default)
+        AIGenerationMode mode = request.mode() != null
+                ? request.mode()
+                : AIGenerationMode.DEFAULT;
+
+        log.debug("Using AI model: {}, mode: {}", selectedModelId, mode);
 
         // 7. Call AI service to generate candidates
         List<CandidateModel> candidates = aiClientService.generateCandidatesFromText(
-                trimmedText, requestedCount, selectedModelId);
+                trimmedText, requestedCount, selectedModelId, mode);
 
         // 8. Create AIGenerationEntity
         AIGenerationEntity entity = new AIGenerationEntity();

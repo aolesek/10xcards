@@ -33,9 +33,12 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 ### 3.4. Generowanie fiszek przez AI
 - Dedykowany interfejs do wklejania tekstu (od 500 do 10 000 znaków) w celu wygenerowania fiszek.
 - Przed rozpoczęciem generowania użytkownik musi wybrać istniejącą talię lub utworzyć nową.
+- Użytkownik wybiera tryb generacji:
+  - **Przyswajanie wiedzy** (domyślny): AI tworzy fiszki na podstawie całego tekstu źródłowego.
+  - **Nauka języka (A1–C2)**: AI identyfikuje słowa trudniejsze niż wskazany poziom CEFR i tworzy fiszki typu: słowo → definicja słownikowa (w języku słowa) + tłumaczenie na polski. Tryb zaprojektowany głównie pod język angielski, ale może działać z innymi językami (nie-PL).
 - Użytkownik wybiera model AI z predefiniowanej listy (domyślnie `openai/gpt-4o-mini`; backend waliduje allow-listę).
-- Użytkownik podaje oczekiwaną liczbę fiszek do wygenerowania (domyślnie 10, maksymalnie 100).
-- Synchroniczny proces po stronie backendu, który na podstawie tekstu zwraca listę fiszek-kandydatów.
+- Użytkownik podaje oczekiwaną liczbę fiszek do wygenerowania (domyślnie 10, maksymalnie 100). W trybie "Przyswajanie wiedzy" jest to liczba kandydatów generowanych z całego tekstu. W trybach językowych jest to maksymalny limit fiszek – jeśli słów spełniających kryteria jest więcej, AI wybiera najważniejsze/najczęstsze.
+- Synchroniczny proces po stronie backendu, który na podstawie tekstu zwraca listę fiszek-kandydatów (może być pusta jeśli nie znaleziono słów spełniających kryteria).
 - Sesja przeglądu wygenerowanych kandydatów jest utrwalana na backendzie, co pozwala na powrót do niej np. po odświeżeniu strony.
 - Asynchroniczna obsługa na frontendzie, aby nie blokować interfejsu użytkownika podczas generowania.
 - Prezentacja wygenerowanych kandydatów w formie siatki.
@@ -43,7 +46,7 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 - Edycja kandydata odbywa się w oknie modalnym.
 - Możliwość wsadowego zapisu wszystkich zaakceptowanych i edytowanych fiszek do wybranej talii za pomocą jednego żądania.
 - Wprowadzenie miesięcznego limitu na liczbę generacji fiszek przez AI dla każdego użytkownika.
-- Dostępny jest widok „Historia generowań AI” (read-only, paginowany) pokazujący wykonane generowania bieżącego użytkownika (m.in. data, model, hash i długość tekstu, liczby wygenerowanych oraz zaakceptowanych/edytowanych).
+- Dostępny jest widok „Historia generowań AI" (read-only, paginowany) pokazujący wykonane generowania bieżącego użytkownika (m.in. data, model, hash i długość tekstu, liczby wygenerowanych oraz zaakceptowanych/edytowanych).
 
 ### 3.5. Tryb nauki
 - Prosty interfejs do przeglądania fiszek z wybranej talii w losowej kolejności.
@@ -153,10 +156,11 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
     - W aplikacji dostępna jest dedykowana sekcja do generowania fiszek.
     - Pole tekstowe akceptuje tekst o długości od 500 do 10 000 znaków.
     - Przed rozpoczęciem generowania muszę wybrać istniejącą talię lub utworzyć nową, do której zostaną przypisane fiszki.
+    - Mogę wybrać tryb generacji: "Przyswajanie wiedzy" (domyślny) lub jeden z trybów językowych A1–C2.
     - Mogę wybrać model AI z listy (domyślnie `openai/gpt-4o-mini`).
-    - Mogę ustawić oczekiwaną liczbę fiszek (domyślnie 10, maksymalnie 100).
+    - Mogę ustawić oczekiwaną liczbę fiszek (domyślnie 10, maksymalnie 100) jako maksymalny limit kandydatów.
     - Po wklejeniu tekstu i kliknięciu "Generuj" rozpoczyna się proces, a UI nie jest blokowane.
-    - Po zakończeniu procesu jestem przekierowywany do widoku przeglądu fiszek-kandydatów.
+    - Po zakończeniu procesu jestem przekierowywany do widoku przeglądu fiszek-kandydatów (lista może być pusta jeśli nie znaleziono słów spełniających kryteria w trybach językowych).
 
 ### ID: US-011
 - Tytuł: Przegląd i edycja wygenerowanych fiszek
@@ -217,8 +221,9 @@ Głównym problemem, który rozwiązuje 10xCards, jest czasochłonność i wysi�
 - Opis: Jako użytkownik, chcę móc zobaczyć listę moich dotychczasowych generowań AI, aby mieć wgląd w historię użycia i parametry generacji.
 - Kryteria akceptacji:
     - Dostępny jest widok historii generowań dostępny tylko dla zalogowanego użytkownika.
-    - Widok wyświetla paginowaną listę generowań bieżącego użytkownika (bez akcji na wierszach).
+    - Widok wyświetla paginowaną listę generowań bieżącego użytkownika.
     - Dla każdego wpisu widoczne są podstawowe informacje: data, model AI, hash i długość tekstu, liczba wygenerowanych oraz zaakceptowanych/edytowanych kandydatów.
+    - Kliknięcie na wiersz w tabeli przekierowuje do widoku przeglądu danej generacji (AI Review).
 
 ## 6. Metryki sukcesu
 

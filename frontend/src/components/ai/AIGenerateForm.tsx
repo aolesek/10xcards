@@ -5,11 +5,14 @@ import { LoadingButton } from "@/components/auth/LoadingButton";
 import { InlineError } from "@/components/auth/InlineError";
 import { DeckSelect } from "./DeckSelect";
 import { AIModelSelect } from "./AIModelSelect";
+import { AIGenerationModeSelect } from "./AIGenerationModeSelect";
 import { TextareaWithCounter } from "./TextareaWithCounter";
 import type {
   AIGenerateFormVm,
   AIGenerateFormErrorsVm,
   DeckOptionVm,
+  AIGenerationMode,
+  AIGenerationModeOptionVm,
 } from "@/lib/ai/aiTypes";
 import type { AIModelId, AIModelOptionVm } from "@/lib/ai/aiModels";
 
@@ -18,10 +21,12 @@ interface AIGenerateFormProps {
   errors: AIGenerateFormErrorsVm;
   deckOptions: DeckOptionVm[];
   modelOptions: AIModelOptionVm[];
+  modeOptions: AIGenerationModeOptionVm[];
   isDecksLoading: boolean;
   isSubmitting: boolean;
   onDeckChange: (deckId: string) => void;
   onModelChange: (model: AIModelId) => void;
+  onModeChange: (mode: AIGenerationMode) => void;
   onSourceTextChange: (value: string) => void;
   onRequestedCandidatesCountChange: (value: number) => void;
   onOpenCreateDeckDialog: () => void;
@@ -33,10 +38,12 @@ export function AIGenerateForm({
   errors,
   deckOptions,
   modelOptions,
+  modeOptions,
   isDecksLoading,
   isSubmitting,
   onDeckChange,
   onModelChange,
+  onModeChange,
   onSourceTextChange,
   onRequestedCandidatesCountChange,
   onOpenCreateDeckDialog,
@@ -78,6 +85,15 @@ export function AIGenerateForm({
           Utwórz nową talię
         </Button>
       </div>
+
+      {/* Generation mode selection */}
+      <AIGenerationModeSelect
+        value={form.mode}
+        options={modeOptions}
+        disabled={isDisabled}
+        error={errors.mode}
+        onChange={onModeChange}
+      />
 
       {/* AI Model selection */}
       <AIModelSelect

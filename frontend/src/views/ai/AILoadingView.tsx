@@ -30,7 +30,7 @@ export function AILoadingView() {
     const state = location.state as AIGenerateNavigationState | null;
 
     // Redirect if no state
-    if (!state || !state.deckId || !state.sourceText || !state.requestedCandidatesCount || !state.model) {
+    if (!state || !state.deckId || !state.sourceText || !state.requestedCandidatesCount || !state.model || !state.mode) {
       navigate("/ai/generate", { replace: true });
       return;
     }
@@ -49,6 +49,7 @@ export function AILoadingView() {
       sourceText: state.sourceText,
       requestedCandidatesCount: state.requestedCandidatesCount,
       model: state.model,
+      mode: state.mode,
     });
 
     if (Object.keys(validationErrors).length > 0) {
@@ -68,6 +69,7 @@ export function AILoadingView() {
         sourceText: state.sourceText.trim(),
         requestedCandidatesCount: state.requestedCandidatesCount,
         model: state.model,
+        mode: state.mode,
       });
 
       // Navigate to review page on success

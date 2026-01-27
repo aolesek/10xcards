@@ -1,5 +1,6 @@
 import type { AIGenerateFormVm, AIGenerateFormErrorsVm } from "./aiTypes";
 import { isValidAIModelId } from "./aiModels";
+import { isValidAIGenerationMode } from "./aiGenerationModes";
 
 /**
  * Validate AI generate form
@@ -20,6 +21,13 @@ export function validateGenerateForm(form: AIGenerateFormVm): AIGenerateFormErro
     errors.model = "Wybierz model AI";
   } else if (!isValidAIModelId(form.model)) {
     errors.model = "Wybierz poprawny model AI";
+  }
+
+  // Validate mode
+  if (!form.mode || form.mode.trim().length === 0) {
+    errors.mode = "Wybierz tryb generacji";
+  } else if (!isValidAIGenerationMode(form.mode)) {
+    errors.mode = "Wybierz poprawny tryb generacji";
   }
 
   // Validate sourceText

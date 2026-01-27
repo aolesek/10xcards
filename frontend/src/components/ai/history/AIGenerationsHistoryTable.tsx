@@ -10,9 +10,10 @@ import type { AIGenerationHistoryRowVm } from "@/lib/ai/aiTypes";
 
 interface AIGenerationsHistoryTableProps {
   rows: AIGenerationHistoryRowVm[];
+  onRowClick?: (generationId: number) => void;
 }
 
-export function AIGenerationsHistoryTable({ rows }: AIGenerationsHistoryTableProps) {
+export function AIGenerationsHistoryTable({ rows, onRowClick }: AIGenerationsHistoryTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -28,7 +29,11 @@ export function AIGenerationsHistoryTable({ rows }: AIGenerationsHistoryTablePro
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow 
+              key={row.id}
+              onClick={() => onRowClick?.(row.id)}
+              className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
+            >
               <TableCell className="font-medium">{row.createdAtLabel}</TableCell>
               <TableCell>{row.aiModel}</TableCell>
               <TableCell>

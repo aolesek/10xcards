@@ -44,6 +44,7 @@ function mapToReviewVm(dto: AIGenerationResponseDto): AIReviewVm {
     generationId: dto.id,
     deckId: dto.deckId,
     aiModel: dto.aiModel,
+    generatedCandidatesCount: dto.generatedCandidatesCount,
     candidates,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
@@ -497,6 +498,7 @@ export function AIReviewView() {
               {/* Candidate grid */}
               <CandidateGrid
                 candidates={visibleCandidates}
+                generatedCandidatesCount={generation.generatedCandidatesCount}
                 isUpdatingIds={updatingCandidateIds}
                 onAccept={handleAccept}
                 onReject={handleReject}

@@ -19,6 +19,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import pl.olesek._xcards.ai.exception.AIServiceUnavailableException;
+import pl.olesek._xcards.ai.model.AIGenerationMode;
 import pl.olesek._xcards.ai.model.CandidateModel;
 
 import java.util.HashMap;
@@ -47,8 +48,11 @@ public class AIClientService {
     @Value("${app.ai.openrouter.model}")
     private String model;
 
-    @Value("${app.ai.prompt-template}")
-    private String promptTemplate;
+    @Value("${app.ai.prompt-template.knowledge}")
+    private String promptTemplateKnowledge;
+
+    @Value("${app.ai.prompt-template.language}")
+    private String promptTemplateLanguage;
 
     private static final int MAX_RETRIES = 2;
     private static final long RETRY_DELAY_MS = 1000;
@@ -61,11 +65,11 @@ public class AIClientService {
      * @param requestedCount the number of flashcard candidates to generate (1-100)
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
-     * @deprecated Use {@link #generateCandidatesFromText(String, int, String)} instead
+     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)} instead
      */
     @Deprecated
     public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount) {
-        return generateCandidatesFromText(sourceText, requestedCount, model);
+        return generateCandidatesFromText(sourceText, requestedCount, model, AIGenerationMode.DEFAULT);
     }
 
     /**
@@ -77,13 +81,32 @@ public class AIClientService {
      * @param modelId the AI model to use for generation
      * @return list of generated candidates with unique IDs
      * @throws AIServiceUnavailableException if AI service is unavailable after retries
+     * @deprecated Use {@link #generateCandidatesFromText(String, int, String, AIGenerationMode)} instead
      */
+    @Deprecated
     public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount, String modelId) {
-        log.debug("Calling OpenRouter API with model={}, requestedCount={}", modelId, requestedCount);
+        return generateCandidatesFromText(sourceText, requestedCount, modelId, AIGenerationMode.DEFAULT);
+    }
+
+    /**
+     * Generates flashcard candidates from source text using AI. Includes retry logic for handling
+     * transient failures.
+     * 
+     * @param sourceText the text to generate flashcards from
+     * @param requestedCount the number of flashcard candidates to generate (1-100)
+     * @param modelId the AI model to use for generation
+     * @param mode the generation mode (knowledge assimilation or language learning)
+     * @return list of generated candidates with unique IDs
+     * @throws AIServiceUnavailableException if AI service is unavailable after retries
+     */
+    public List<CandidateModel> generateCandidatesFromText(String sourceText, int requestedCount, 
+            String modelId, AIGenerationMode mode) {
+        log.debug("Calling OpenRouter API with model={}, requestedCount={}, mode={}", 
+                modelId, requestedCount, mode);
 
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
-                return callOpenRouterAPI(sourceText, requestedCount, modelId);
+                return callOpenRouterAPI(sourceText, requestedCount, modelId, mode);
             } catch (ResourceAccessException | HttpServerErrorException e) {
                 log.warn("OpenRouter API attempt {} failed: {}", attempt + 1, e.getMessage());
 
@@ -114,12 +137,27 @@ public class AIClientService {
      * @param sourceText the text to generate flashcards from
      * @param requestedCount the number of flashcard candidates to generate
      * @param modelId the AI model to use for generation
+     * @param mode the generation mode
      * @return list of candidate models
      */
-    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount, String modelId) {
+    private List<CandidateModel> callOpenRouterAPI(String sourceText, int requestedCount, 
+            String modelId, AIGenerationMode mode) {
+        
+        // Select prompt template based on mode
+        String promptTemplate = mode.isLanguageMode() 
+                ? promptTemplateLanguage 
+                : promptTemplateKnowledge;
+        
+        // Build prompt with placeholders
         String prompt = promptTemplate
                 .replace("{text}", sourceText)
                 .replace("{count}", String.valueOf(requestedCount));
+        
+        // For language modes, add CEFR level
+        if (mode.isLanguageMode()) {
+            String cefrLevel = mode.getCefrLevel();
+            prompt = prompt.replace("{level}", cefrLevel);
+        }
 
         // Build request body according to OpenRouter API specification
         Map<String, Object> requestBody = new HashMap<>();

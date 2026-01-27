@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import pl.olesek._xcards.ai.model.AIModel;
+import pl.olesek._xcards.ai.model.AIGenerationMode;
 
 import java.util.UUID;
 
@@ -40,5 +41,15 @@ public record GenerateFlashcardsRequest(
                 example = "openai/gpt-4o-mini",
                 allowableValues = {"openai/gpt-4o-mini", "openai/gpt-5-mini", "google/gemini-2.5-flash",
                         "x-ai/grok-4.1-fast", "anthropic/claude-sonnet-4.5", "deepseek/deepseek-v3.2"})
-        AIModel model) {
+        AIModel model,
+
+        @Schema(description = "AI generation mode. If not provided, defaults to KNOWLEDGE_ASSIMILATION. "
+                + "Allowed values: KNOWLEDGE_ASSIMILATION (default - generates flashcards from entire text), "
+                + "LANGUAGE_A1, LANGUAGE_A2, LANGUAGE_B1, LANGUAGE_B2, LANGUAGE_C1, LANGUAGE_C2 "
+                + "(language learning modes - generate flashcards for words above specified CEFR level)",
+                example = "KNOWLEDGE_ASSIMILATION",
+                defaultValue = "KNOWLEDGE_ASSIMILATION",
+                allowableValues = {"KNOWLEDGE_ASSIMILATION", "LANGUAGE_A1", "LANGUAGE_A2", 
+                        "LANGUAGE_B1", "LANGUAGE_B2", "LANGUAGE_C1", "LANGUAGE_C2"})
+        AIGenerationMode mode) {
 }

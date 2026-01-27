@@ -177,6 +177,10 @@ export function AIGenerationsHistoryView() {
     retry();
   }, [retry]);
 
+  const handleRowClick = useCallback((generationId: number) => {
+    navigate(`/ai/review/${generationId}`);
+  }, [navigate]);
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -214,7 +218,7 @@ export function AIGenerationsHistoryView() {
           {/* Table */}
           {!isLoading && !error && rows.length > 0 && (
             <div className="space-y-4">
-              <AIGenerationsHistoryTable rows={rows} />
+              <AIGenerationsHistoryTable rows={rows} onRowClick={handleRowClick} />
 
               {/* Pagination */}
               {pageMeta && (
