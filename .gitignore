@@ -32,9 +32,17 @@ build/
 ### VS Code ###
 .vscode/
 
+### Node.js / NPM ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+*.log
+
 ### Database ###
 # Local database backups
-*.sql
 *.dump
 
 # Local application properties overrides
@@ -48,3 +56,18 @@ application-dev.properties
 ### Docker ###
 # Docker volumes data (if mounted locally)
 postgres_data/
+
+### Testing ###
+# Test coverage reports
+coverage/
+.nyc_output/
+jacoco.exec
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+screenshots/
+
+# Vitest
+frontend/coverage/
