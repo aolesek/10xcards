@@ -18,6 +18,18 @@ Backend:
 - assertj
 - spotless
 
+Testy:
+- Unit (backend): JUnit 5, Mockito, AssertJ
+- Integracyjne API + security (backend): RestAssured
+- Integracja DB (backend): Testcontainers (PostgreSQL) + Liquibase
+- Integracja z OpenRouter (backend): WireMock
+- Kontrakty API (backend + frontend): Spring Cloud Contract (testy producenta + stuby dla konsumenta)
+- Testy architektury (backend): ArchUnit
+- Pokrycie (backend): JaCoCo
+- Unit (frontend): Vitest
+- Testy komponentów (frontend): Testing Library (React)
+- E2E (UI): Playwright
+
 AI - Komunikacja z modelami przez usługę Openrouter.ai:
 - Dostęp do szerokiej gamy modeli (OpenAI, Anthropic, Google i wiele innych), które pozwolą nam znaleźć rozwiązanie zapewniające wysoką efektywność i niskie koszta
 - Pozwala na ustawianie limitów finansowych na klucze API

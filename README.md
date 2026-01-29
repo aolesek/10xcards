@@ -9,6 +9,7 @@ AI-powered flashcard app for students and lifelong learners.
 **Backend:** Java 21, Spring Boot 3.5.7, Spring Data JPA, Spring Security, PostgreSQL, Liquibase, Lombok, Maven  
 **AI:** Openrouter.ai (OpenAI, Anthropic, Google models)  
 **Deployment:** Docker, GitHub Actions, DigitalOcean  
+**Testing:** JUnit 5, Mockito, AssertJ, RestAssured, Testcontainers, WireMock, Spring Cloud Contract, ArchUnit, JaCoCo; Frontend: Vitest, Testing Library, Playwright  
 **Frontend (Planned):** React 19, TypeScript, Tailwind CSS 4, Shadcn/ui
 
 ## Quick Setup
