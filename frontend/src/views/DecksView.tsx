@@ -174,7 +174,7 @@ export function DecksView() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8" data-testid="decks-view">
         <div className="space-y-6">
           {/* Header */}
           <DecksHeader

@@ -107,7 +107,7 @@ export function CreateDeckDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent data-testid="create-deck-dialog">
         <DialogHeader>
           <DialogTitle>Utwórz nową talię</DialogTitle>
           <DialogDescription>
@@ -115,9 +115,9 @@ export function CreateDeckDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} data-testid="create-deck-form">
           <div className="space-y-4">
-            {formError && <InlineError message={formError} />}
+            {formError && <InlineError message={formError} data-testid="form-error" />}
             
             <div className="space-y-2">
               <Label htmlFor={nameId}>Nazwa talii</Label>
@@ -130,9 +130,10 @@ export function CreateDeckDialog({
                 aria-invalid={!!nameError}
                 aria-describedby={nameError ? errorId : undefined}
                 autoFocus
+                data-testid="deck-name-input"
               />
               {nameError && (
-                <p id={errorId} className="text-sm text-destructive" role="alert">
+                <p id={errorId} className="text-sm text-destructive" role="alert" data-testid="deck-name-error">
                   {nameError}
                 </p>
               )}
@@ -140,7 +141,7 @@ export function CreateDeckDialog({
           </div>
           
           <DialogFooter className="mt-6">
-            <LoadingButton isLoading={isSubmitting}>
+            <LoadingButton isLoading={isSubmitting} data-testid="submit-create-deck-button">
               Utwórz talię
             </LoadingButton>
           </DialogFooter>

@@ -12,9 +12,9 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.emailInput = page.getByLabel("Email");
-    this.passwordInput = page.getByLabel("Password");
-    this.loginButton = page.getByRole("button", { name: "Sign In" });
+    this.emailInput = page.getByTestId("login-email-input");
+    this.passwordInput = page.getByTestId("login-password-input");
+    this.loginButton = page.getByTestId("login-submit-button");
     this.errorMessage = page.getByRole("alert");
   }
 
@@ -27,11 +27,14 @@ export class LoginPage extends BasePage {
 
   /**
    * Perform login with credentials
+   * Note: This will trigger navigation to /decks on success
    */
   async login(email: string, password: string): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
+    // Wait for navigation to complete after successful login (increased timeout for E2E)
+    await this.page.waitForURL(/.*\/decks/, { timeout: 30000 });
   }
 
   /**

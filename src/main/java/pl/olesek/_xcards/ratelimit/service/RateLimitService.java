@@ -5,6 +5,7 @@ import io.github.bucket4j.Bucket;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -20,7 +21,14 @@ public class RateLimitService {
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
+    @Value("${app.rate-limit.enabled:false}")
+    private boolean enabled;
+
     public boolean tryConsume(String key, int maxTokens, Duration refillPeriod) {
+        if (!enabled) {
+            return true;
+        }
+
         Bucket bucket = buckets.computeIfAbsent(key, k -> createBucket(maxTokens, refillPeriod));
         boolean consumed = bucket.tryConsume(1);
 

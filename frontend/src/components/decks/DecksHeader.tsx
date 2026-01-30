@@ -39,11 +39,11 @@ export function DecksHeader({
             <History className="mr-2 h-4 w-4" />
             Historia generowań AI
           </Button>
-          <Button onClick={onAiGenerateClick} disabled={isDisabled} variant="outline">
+          <Button onClick={onAiGenerateClick} disabled={isDisabled} variant="outline" data-testid="ai-generate-button">
             <Sparkles className="mr-2 h-4 w-4" />
             Generuj fiszki (AI)
           </Button>
-          <Button onClick={onCreateClick} disabled={isDisabled}>
+          <Button onClick={onCreateClick} disabled={isDisabled} data-testid="create-deck-button">
             Utwórz talię
           </Button>
         </div>

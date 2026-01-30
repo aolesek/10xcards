@@ -135,6 +135,7 @@ export function LoginView() {
               disabled={isSubmitting}
               aria-invalid={!!fieldErrors.email}
               aria-describedby={fieldErrors.email ? `${emailId}-error` : undefined}
+              data-testid="login-email-input"
             />
             {fieldErrors.email && (
               <p
@@ -158,6 +159,7 @@ export function LoginView() {
               disabled={isSubmitting}
               aria-invalid={!!fieldErrors.password}
               aria-describedby={fieldErrors.password ? `${passwordId}-error` : undefined}
+              data-testid="login-password-input"
             />
             {fieldErrors.password && (
               <p
@@ -179,7 +181,7 @@ export function LoginView() {
             </Link>
           </div>
 
-          <LoadingButton isLoading={isSubmitting} type="submit">
+          <LoadingButton isLoading={isSubmitting} type="submit" data-testid="login-submit-button">
             Zaloguj się
           </LoadingButton>
         </form>

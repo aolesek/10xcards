@@ -24,7 +24,7 @@ export function DeckCard({
   onDelete,
 }: DeckCardProps) {
   return (
-    <Card>
+    <Card data-testid="deck-card">
       <CardHeader>
         <CardTitle className="line-clamp-2">{item.name}</CardTitle>
       </CardHeader>

@@ -8,6 +8,7 @@ interface LoadingButtonProps {
   type?: "button" | "submit";
   children: ReactNode;
   onClick?: () => void;
+  "data-testid"?: string;
 }
 
 export function LoadingButton({
@@ -16,6 +17,7 @@ export function LoadingButton({
   type = "submit",
   children,
   onClick,
+  "data-testid": dataTestId,
 }: LoadingButtonProps) {
   return (
     <Button
@@ -23,6 +25,7 @@ export function LoadingButton({
       disabled={isLoading || disabled}
       onClick={onClick}
       className="w-full"
+      data-testid={dataTestId}
     >
       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {children}
