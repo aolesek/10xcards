@@ -16,6 +16,13 @@ jobs:
       JAVA_DISTRIBUTION: 'temurin'
     
     steps:
+      - name: Clear problematic Prometheus BOM from cache
+        run: |
+          if [ -f ~/.m2/repository/io/prometheus/simpleclient_bom/0.16.0/simpleclient_bom-0.16.0.pom ]; then
+            echo "Removing corrupted Prometheus BOM..."
+            rm -rf ~/.m2/repository/io/prometheus/simpleclient_bom/0.16.0/
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v6
       
@@ -27,7 +34,9 @@ jobs:
           cache: 'maven'
       
       - name: Build and test backend
-        run: mvn clean verify
+        run: mvn clean verify -B
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: false
 
   frontend:
     name: Frontend Build & Test
