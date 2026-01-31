@@ -36,4 +36,4 @@ AI - Komunikacja z modelami przez usługę Openrouter.ai:
 
 CI/CD i Hosting:
 - Github Actions do tworzenia pipeline’ów CI/CD
-- DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+- Docelowo (na ten moment): hosting na własnym VPS + deploy bezpośrednio z GitHub Actions przez GHCR (aplikacja wymaga FE + BE + Postgresa, VPSa już mam więc mocno zredukuje koszty względem początkowo zakładanego DigitalOcean)
