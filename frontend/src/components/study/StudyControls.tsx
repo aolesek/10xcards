@@ -26,12 +26,19 @@ export function StudyControls({
         size="lg"
         onClick={onPrev}
         disabled={!canGoPrev}
+        data-testid="study-prev-button"
       >
         <ChevronLeft className="h-4 w-4" />
         Poprzednia
       </Button>
 
-      <Button type="button" variant="secondary" size="lg" onClick={onToggleReveal}>
+      <Button 
+        type="button" 
+        variant="secondary" 
+        size="lg" 
+        onClick={onToggleReveal}
+        data-testid="study-reveal-button"
+      >
         {isRevealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         {isRevealed ? "Ukryj" : "Odsłoń"}
       </Button>
@@ -42,6 +49,7 @@ export function StudyControls({
         size="lg"
         onClick={onNext}
         disabled={!canGoNext}
+        data-testid="study-next-button"
       >
         Następna
         <ChevronRight className="h-4 w-4" />

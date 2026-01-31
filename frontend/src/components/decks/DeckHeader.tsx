@@ -53,7 +53,11 @@ export function DeckHeader({
           <Button onClick={onCreateClick} disabled={isDisabled} variant="outline">
             Dodaj fiszkę
           </Button>
-          <Button onClick={onStudyClick} disabled={isDisabled || flashcardCount === 0}>
+          <Button 
+            onClick={onStudyClick} 
+            disabled={isDisabled || flashcardCount === 0}
+            data-testid="study-button"
+          >
             Ucz się
           </Button>
         </div>

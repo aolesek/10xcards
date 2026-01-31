@@ -8,7 +8,7 @@ interface StudyEmptyStateProps {
 
 export function StudyEmptyState({ onBackToDeck, onBackToDecksList }: StudyEmptyStateProps) {
   return (
-    <Card>
+    <Card data-testid="study-empty-state">
       <CardHeader>
         <CardTitle>Brak fiszek</CardTitle>
       </CardHeader>

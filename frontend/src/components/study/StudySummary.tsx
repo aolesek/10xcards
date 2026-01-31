@@ -10,21 +10,32 @@ interface StudySummaryProps {
 
 export function StudySummary({ totalCards, onRestart, onBackToDeck }: StudySummaryProps) {
   return (
-    <Card>
+    <Card data-testid="study-summary">
       <CardHeader>
         <CardTitle>Koniec sesji</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-muted-foreground">
-          Przejrzano <span className="font-medium text-foreground">{totalCards}</span> fiszek.
+          Przejrzano <span className="font-medium text-foreground" data-testid="study-total-cards">{totalCards}</span> fiszek.
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button type="button" onClick={onRestart} className="sm:flex-1">
+          <Button 
+            type="button" 
+            onClick={onRestart} 
+            className="sm:flex-1"
+            data-testid="study-restart-button"
+          >
             <RotateCcw className="h-4 w-4" />
             Powtórz
           </Button>
-          <Button type="button" variant="outline" onClick={onBackToDeck} className="sm:flex-1">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onBackToDeck} 
+            className="sm:flex-1"
+            data-testid="study-back-to-deck-button"
+          >
             Wróć do talii
           </Button>
         </div>

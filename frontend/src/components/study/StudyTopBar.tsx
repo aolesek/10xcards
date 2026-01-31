@@ -41,10 +41,10 @@ export function StudyTopBar({ deckName, progressText, onBackClick }: StudyTopBar
         </Button>
 
         <div className="min-w-0 flex-1 text-center">
-          <h1 className="truncate text-base font-semibold sm:text-lg">{deckName}</h1>
+          <h1 className="truncate text-base font-semibold sm:text-lg" data-testid="study-deck-name">{deckName}</h1>
         </div>
 
-        <div className="shrink-0 text-sm text-muted-foreground tabular-nums">
+        <div className="shrink-0 text-sm text-muted-foreground tabular-nums" data-testid="study-progress">
           {progressText}
         </div>
       </header>
