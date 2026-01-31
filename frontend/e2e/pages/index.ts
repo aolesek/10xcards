@@ -9,3 +9,5 @@ export { DecksPage } from "./DecksPage";
 export { DeckDetailsPage } from "./DeckDetailsPage";
 export { StudyPage } from "./StudyPage";
 export { CreateDeckDialog } from "./CreateDeckDialog";
+export { AIGeneratePage } from "./AIGeneratePage";
+export { AIGenerateForm } from "./AIGenerateForm";

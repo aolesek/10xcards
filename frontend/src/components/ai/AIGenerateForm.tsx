@@ -81,6 +81,7 @@ export function AIGenerateForm({
           size="sm"
           onClick={onOpenCreateDeckDialog}
           disabled={isDisabled}
+          data-testid="create-deck-button"
         >
           Utwórz nową talię
         </Button>
@@ -126,6 +127,7 @@ export function AIGenerateForm({
           value={form.requestedCandidatesCount}
           onChange={handleCountChange}
           disabled={isDisabled}
+          data-testid="flashcard-count-input"
           className={errors.requestedCandidatesCount ? "border-destructive" : ""}
         />
         {errors.requestedCandidatesCount && (

@@ -45,6 +45,7 @@ export function TextareaWithCounter({
         disabled={disabled}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : hintId}
+        data-testid="source-text-input"
         className="min-h-[200px] resize-y"
       />
       <div className="flex items-center justify-between">

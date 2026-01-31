@@ -207,7 +207,7 @@ export function AIGenerateView() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto max-w-3xl px-4 py-8">
+      <div className="container mx-auto max-w-3xl px-4 py-8" data-testid="ai-generate-view">
         <div className="space-y-6">
           {/* User menu */}
           <div className="flex justify-end">
