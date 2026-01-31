@@ -18,10 +18,10 @@ public record CandidateUpdateDto(
         UUID id,
 
         @NotNull(message = "Status is required")
-        @Pattern(regexp = "accepted|rejected|edited",
-                message = "Status must be: accepted, rejected, or edited")
+        @Pattern(regexp = "accepted|rejected|edited|pending",
+                message = "Status must be: accepted, rejected, edited, or pending")
         @Schema(description = "New status for the candidate",
-                allowableValues = {"accepted", "rejected", "edited"}, example = "accepted")
+                allowableValues = {"accepted", "rejected", "edited", "pending"}, example = "accepted")
         String status,
 
         @Size(max = 500, message = "Edited front cannot exceed 500 characters")

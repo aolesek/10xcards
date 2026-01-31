@@ -119,7 +119,7 @@ export interface AIGenerateNavigationState {
  */
 export interface CandidateUpdateDto {
   id: string; // UUID
-  status: "accepted" | "rejected" | "edited";
+  status: "accepted" | "rejected" | "edited" | "pending";
   editedFront?: string | null;
   editedBack?: string | null;
 }

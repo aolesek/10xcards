@@ -28,6 +28,46 @@ services:
     networks:
       - 10xcards-network
 
+  # 10xCards Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 10xcards-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Database connection
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/10xcards
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production-at-least-256-bits-long}
+      
+      # Email Configuration (optional for local dev)
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      
+      # AI Configuration (optional)
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      
+      # App Configuration
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    networks:
+      - 10xcards-network
+
   # Optional: pgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest

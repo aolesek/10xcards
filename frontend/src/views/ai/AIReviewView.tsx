@@ -135,7 +135,7 @@ export function AIReviewView() {
   }, [fetchGeneration]);
 
   /**
-   * Handle accept candidate
+   * Handle accept/unaccept candidate (toggle between accepted and pending)
    */
   const handleAccept = useCallback(
     async (candidateId: string) => {
@@ -145,8 +145,10 @@ export function AIReviewView() {
       const candidate = generation.candidates.find((c) => c.id === candidateId);
       if (!candidate) return;
 
-      // Already accepted, no action needed
-      if (candidate.status === "accepted") return;
+      // Toggle: if accepted or edited, revert to pending; otherwise accept
+      const newStatus = (candidate.status === "accepted" || candidate.status === "edited") 
+        ? "pending" 
+        : "accepted";
 
       // Mark as updating
       setUpdatingCandidateIds((prev) => new Set(prev).add(candidateId));
@@ -156,7 +158,7 @@ export function AIReviewView() {
           candidates: [
             {
               id: candidateId,
-              status: "accepted",
+              status: newStatus,
             },
           ],
         });
@@ -167,7 +169,7 @@ export function AIReviewView() {
           return {
             ...prev,
             candidates: prev.candidates.map((c) =>
-              c.id === candidateId ? { ...c, status: "accepted" } : c
+              c.id === candidateId ? { ...c, status: newStatus } : c
             ),
           };
         });
@@ -182,7 +184,7 @@ export function AIReviewView() {
 
         // Generic error - show error and refresh to sync state
         const message = getErrorMessage(err);
-        setError(`Nie udało się zaakceptować kandydata: ${message}`);
+        setError(`Nie udało się ${newStatus === "pending" ? "cofnąć akceptacji" : "zaakceptować"} kandydata: ${message}`);
         // Optionally refresh to sync state
         fetchGeneration();
       } finally {

@@ -39,11 +39,21 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        // API endpoints that don't require authentication
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
                         .permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .anyRequest().authenticated())
+                        // Frontend static resources (React SPA)
+                        .requestMatchers("/", "/index.html", "/assets/**", "/vite.svg",
+                                "/favicon.ico", "/*.js", "/*.css", "/*.png", "/*.jpg",
+                                "/*.svg", "/*.ico", "/*.webp", "/*.woff", "/*.woff2", "/*.ttf")
+                        .permitAll()
+                        // API endpoints require authentication
+                        .requestMatchers("/api/**").authenticated()
+                        // Allow all other requests (React Router paths)
+                        .anyRequest().permitAll())
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
                         (request, response, authException) -> {
                             response.setStatus(401);

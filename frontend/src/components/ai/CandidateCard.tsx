@@ -100,10 +100,16 @@ export function CandidateCard({
             </Button>
           )}
           {(isAccepted || isEdited) && (
-            <div className="flex flex-1 items-center justify-center gap-1 text-sm text-muted-foreground">
-              <Check className="h-4 w-4 text-green-600" />
-              <span>Zaakceptowano</span>
-            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onAccept(candidate.id)}
+              disabled={isUpdating}
+              className="flex-1 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+            >
+              <Check className="mr-1 h-4 w-4" />
+              Zaakceptowano
+            </Button>
           )}
           <Button
             size="sm"

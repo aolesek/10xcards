@@ -183,7 +183,7 @@ public class AIGenerationService {
     }
 
     /**
-     * Updates the status of flashcard candidates (accept, reject, or edit).
+     * Updates the status of flashcard candidates (accept, reject, edit, or revert to pending).
      * 
      * @param generationId the generation session ID
      * @param request the update request with candidate changes

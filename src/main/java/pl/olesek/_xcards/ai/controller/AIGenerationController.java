@@ -156,7 +156,7 @@ public class AIGenerationController {
     }
 
     /**
-     * Update the status of flashcard candidates (accept, reject, or edit).
+     * Update the status of flashcard candidates (accept, reject, edit, or revert to pending).
      * 
      * @param generationId the generation session ID
      * @param request the update request with candidate changes
@@ -165,8 +165,9 @@ public class AIGenerationController {
      */
     @PatchMapping("/generations/{generationId}/candidates")
     @Operation(summary = "Update candidate statuses",
-            description = "Update the status of flashcard candidates to accepted, rejected, or edited. "
+            description = "Update the status of flashcard candidates to accepted, rejected, edited, or pending. "
                     + "When status is 'edited', both editedFront and editedBack must be provided. "
+                    + "Use 'pending' to revert an accepted or edited candidate back to pending state. "
                     + "Multiple candidates can be updated in a single request.",
             security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses(value = {
