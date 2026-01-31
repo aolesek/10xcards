@@ -1,27 +1,32 @@
 package pl.olesek._xcards.email.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import pl.olesek._xcards.email.template.PasswordResetEmailTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final RestTemplate emailRestTemplate;
 
-    @Value("${spring.mail.username}")
+    @Value("${resend.api-key}")
+    private String apiKey;
+
+    @Value("${resend.from-email:onboarding@resend.dev}")
     private String fromEmail;
 
     @Value("${app.frontend-url}")
@@ -30,25 +35,30 @@ public class EmailService {
     @Async
     public void sendPasswordResetEmail(String toEmail, String resetToken) {
         try {
-            String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
+            String resetLink = frontendUrl + "/password-reset/confirm?token=" + resetToken;
             String emailText = PasswordResetEmailTemplate.generate(resetLink);
 
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+            // Prepare Resend API request
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("from", fromEmail);
+            requestBody.put("to", toEmail);
+            requestBody.put("subject", "Password Reset Request - 10xCards");
+            requestBody.put("text", emailText);
 
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("Password Reset Request - 10xCards");
-            helper.setText(emailText);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(apiKey);
 
-            mailSender.send(message);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+            // Send via Resend API
+            String resendApiUrl = "https://api.resend.com/emails";
+            emailRestTemplate.postForEntity(resendApiUrl, request, String.class);
 
             log.info("Password reset email sent successfully to: {}", toEmail);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error("Failed to send password reset email to: {}", toEmail, e);
             // Don't throw exception - security: don't reveal if email delivery failed
-        } catch (Exception e) {
-            log.error("Unexpected error while sending email to: {}", toEmail, e);
         }
     }
 }

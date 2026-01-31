@@ -1,23 +1,25 @@
 package pl.olesek._xcards.email.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,73 +27,83 @@ import static org.mockito.Mockito.when;
 class EmailServiceTest {
 
     @Mock
-    private JavaMailSender mailSender;
+    private RestTemplate emailRestTemplate;
 
     @InjectMocks
     private EmailService emailService;
 
+    private String testApiKey = "test-api-key";
     private String testFromEmail = "noreply@10xcards.com";
     private String testFrontendUrl = "http://localhost:5173";
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(emailService, "apiKey", testApiKey);
         ReflectionTestUtils.setField(emailService, "fromEmail", testFromEmail);
         ReflectionTestUtils.setField(emailService, "frontendUrl", testFrontendUrl);
     }
 
     @Test
-    void shouldSendPasswordResetEmailSuccessfully() throws MessagingException {
+    void shouldSendPasswordResetEmailSuccessfully() {
         // Given
         String toEmail = "test@example.com";
         String resetToken = "test-reset-token-123";
-        MimeMessage mockMessage = mock(MimeMessage.class);
+        String expectedUrl = "https://api.resend.com/emails";
 
-        when(mailSender.createMimeMessage()).thenReturn(mockMessage);
+        when(emailRestTemplate.postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("Success"));
 
         // When
         emailService.sendPasswordResetEmail(toEmail, resetToken);
 
         // Then
-        verify(mailSender).createMimeMessage();
-        verify(mailSender).send(mockMessage);
+        verify(emailRestTemplate).postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class));
     }
 
     @Test
-    void shouldIncludeCorrectResetLinkInEmail() throws MessagingException {
+    void shouldIncludeCorrectResetLinkInEmail() {
         // Given
         String toEmail = "test@example.com";
         String resetToken = "test-token-456";
-        String expectedResetLink = testFrontendUrl + "/reset-password?token=" + resetToken;
+        String expectedResetLink = testFrontendUrl + "/password-reset/confirm?token=" + resetToken;
+        String expectedUrl = "https://api.resend.com/emails";
 
-        MimeMessage mockMessage = mock(MimeMessage.class);
-        when(mailSender.createMimeMessage()).thenReturn(mockMessage);
+        ArgumentCaptor<HttpEntity> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        when(emailRestTemplate.postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("Success"));
 
         // When
         emailService.sendPasswordResetEmail(toEmail, resetToken);
 
         // Then
-        verify(mailSender).send(mockMessage);
-        // Weryfikujemy że link został wygenerowany (template zawiera link)
-        assertThat(expectedResetLink).contains(resetToken);
-        assertThat(expectedResetLink).startsWith(testFrontendUrl);
+        verify(emailRestTemplate).postForEntity(eq(expectedUrl), requestCaptor.capture(), eq(String.class));
+
+        HttpEntity<Map<String, Object>> capturedRequest = requestCaptor.getValue();
+        Map<String, Object> requestBody = capturedRequest.getBody();
+
+        assertThat(requestBody).isNotNull();
+        assertThat(requestBody.get("to")).isEqualTo(toEmail);
+        assertThat(requestBody.get("from")).isEqualTo(testFromEmail);
+        assertThat(requestBody.get("subject")).isEqualTo("Password Reset Request - 10xCards");
+        assertThat(requestBody.get("text")).asString().contains(expectedResetLink);
     }
 
     @Test
-    void shouldNotPropagateMessagingExceptionToClient() {
+    void shouldNotPropagateRestClientExceptionToClient() {
         // Given
         String toEmail = "test@example.com";
         String resetToken = "test-token";
-        MimeMessage mockMessage = mock(MimeMessage.class);
+        String expectedUrl = "https://api.resend.com/emails";
 
-        when(mailSender.createMimeMessage()).thenReturn(mockMessage);
-        doThrow(new MailSendException("SMTP server unavailable")).when(mailSender)
-                .send(any(MimeMessage.class));
+        doThrow(new RestClientException("API unavailable"))
+                .when(emailRestTemplate)
+                .postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class));
 
         // When/Then - nie powinien rzucić wyjątku (security: nie ujawniać błędów wysyłki)
         assertThatCode(() -> emailService.sendPasswordResetEmail(toEmail, resetToken))
                 .doesNotThrowAnyException();
 
-        verify(mailSender).send(mockMessage);
+        verify(emailRestTemplate).postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class));
     }
 
     @Test
@@ -99,27 +111,38 @@ class EmailServiceTest {
         // Given
         String toEmail = "test@example.com";
         String resetToken = "test-token";
+        String expectedUrl = "https://api.resend.com/emails";
 
-        when(mailSender.createMimeMessage())
-                .thenThrow(new RuntimeException("Unexpected mail server error"));
+        when(emailRestTemplate.postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class)))
+                .thenThrow(new RuntimeException("Unexpected error"));
 
         // When/Then - nie powinien rzucić wyjątku
         assertThatCode(() -> emailService.sendPasswordResetEmail(toEmail, resetToken))
                 .doesNotThrowAnyException();
 
-        verify(mailSender).createMimeMessage();
+        verify(emailRestTemplate).postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class));
     }
 
     @Test
-    void shouldHandleNullPointerExceptionGracefully() {
+    void shouldIncludeAuthorizationHeader() {
         // Given
         String toEmail = "test@example.com";
         String resetToken = "test-token";
+        String expectedUrl = "https://api.resend.com/emails";
 
-        when(mailSender.createMimeMessage()).thenReturn(null); // symulacja błędu
+        ArgumentCaptor<HttpEntity> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        when(emailRestTemplate.postForEntity(eq(expectedUrl), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(ResponseEntity.ok("Success"));
 
-        // When/Then - nie powinien rzucić wyjątku
-        assertThatCode(() -> emailService.sendPasswordResetEmail(toEmail, resetToken))
-                .doesNotThrowAnyException();
+        // When
+        emailService.sendPasswordResetEmail(toEmail, resetToken);
+
+        // Then
+        verify(emailRestTemplate).postForEntity(eq(expectedUrl), requestCaptor.capture(), eq(String.class));
+
+        HttpEntity<Map<String, Object>> capturedRequest = requestCaptor.getValue();
+        String authHeader = capturedRequest.getHeaders().getFirst("Authorization");
+
+        assertThat(authHeader).isEqualTo("Bearer " + testApiKey);
     }
 }

@@ -67,11 +67,8 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Email sending -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
+		<!-- Email sending via Resend.com HTTP API -->
+		<!-- Uses RestTemplate from spring-boot-starter-web -->
 
 		<!-- Rate limiting -->
 		<dependency>
