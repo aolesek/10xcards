@@ -26,7 +26,7 @@ export function DeckCard({
   return (
     <Card data-testid="deck-card">
       <CardHeader>
-        <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+        <CardTitle className="line-clamp-2 leading-tight">{item.name}</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">

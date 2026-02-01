@@ -221,11 +221,12 @@ class AIGenerationServiceTest {
                 AIGenerationMode.KNOWLEDGE_ASSIMILATION);
 
         // Create 100 generations from this month (all within current month)
+        // Use seconds instead of hours/minutes to ensure all generations are within the current month
         List<AIGenerationEntity> generations =
                 java.util.stream.IntStream.range(0, 100).mapToObj(i -> {
                     AIGenerationEntity gen = new AIGenerationEntity();
-                    // Set all generations to be within this month (subtract hours instead of days)
-                    gen.setCreatedAt(Instant.now().minus(i, ChronoUnit.HOURS));
+                    // Set all generations to be within this month (subtract seconds to stay in current month)
+                    gen.setCreatedAt(Instant.now().minus(i, ChronoUnit.SECONDS));
                     return gen;
                 }).toList();
 
